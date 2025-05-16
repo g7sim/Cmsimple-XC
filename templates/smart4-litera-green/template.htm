@@ -26,15 +26,15 @@ if (function_exists('fa_require')) {
 <div class="wrap">
 
 <?php
-if ($login === true) {
+if ( XH_ADM || $edit || $login === true) {
     echo "<style>
     header.main-header nav.navbar { margin-top: 30px !important; }
-    nav.navbar.fixed-top { top: 30px !important; }
+    nav.navbar.fixed-top { top: 28px !important; }
     </style>";
 } else {
     echo "<style>
     header.main-header nav.navbar { margin-top: 1px !important; }
-    nav.navbar.fixed-top { top: -10px !important; }
+    nav.navbar.fixed-top { top: -1px !important; }
     </style>";
 }
 ?>
