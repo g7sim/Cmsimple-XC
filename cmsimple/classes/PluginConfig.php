@@ -79,12 +79,18 @@ class PluginConfig implements ArrayAccess
      */
 #[\ReturnTypeWillChange]
     public function offsetGet($offset)
-    {
-        if (!isset($this->configs[$offset])) {
-            $this->loadConfig($offset);
-        }
-        return $this->configs[$offset];
+{
+    if (!isset($this->configs[$offset])) {
+        $this->loadConfig($offset);
     }
+    if ($offset === 'register' && !isset($this->configs[$offset])) { // Add this check
+        echo "<pre>Error: 'register' key not set before return.\n";
+        echo "Called from:\n";
+        debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        echo "</pre>";
+        }
+    return $this->configs[$offset];   
+}
 
     /**
      * Sets the value at an offset.
@@ -126,14 +132,26 @@ class PluginConfig implements ArrayAccess
      *
      * @return void
      */
-    private function loadConfig($pluginname)
-    {
-        global $pth;
-    
+    private function loadConfig($pluginname)   {
+		 global $pth;
+	 // --- Add this block for debugging 'register' ---
+        if ($pluginname === 'register') {
+        error_log("DEBUG: loadConfig called for offset = 'register'");
+
+        // Construct the expected path (adjust if CMSimple_XH does it differently)
+        $expectedPath = CMSIMPLE_ROOT . 'plugins/' . $pluginname . '/config/config.php';
+        error_log("DEBUG: Expecting config file at: " . $expectedPath);
+        error_log("DEBUG: File exists? " . (file_exists($expectedPath) ? 'Yes' : 'No'));
+        error_log("DEBUG: File readable? " . (is_readable($expectedPath) ? 'Yes' : 'No'));
+
+        // Check $this->configs BEFORE attempting load
+         error_log("DEBUG: BEFORE load, isset(\$this->configs['register'])? " . (isset($this->configs['register']) ? 'Yes' : 'No'));
+        }
+	        
         pluginFiles($pluginname);
         if ($this->language) {
             XH_createLanguageFile($pth['file']['plugin_language']);
         }
         $this->configs += XH_readConfiguration(true, $this->language);
-    }
-}
+        }
+	}

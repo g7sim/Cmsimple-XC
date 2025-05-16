@@ -3,27 +3,35 @@
 /**
  * Copyright (c) Christoph M. Becker
  *
- * This file is part of Toxic_XH.
+ * This file is part of Plib_XH.
  *
- * Toxic_XH is free software: you can redistribute it and/or modify
+ * Plib_XH is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Toxic_XH is distributed in the hope that it will be useful,
+ * Plib_XH is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Toxic_XH.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Plib_XH.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-use Plib\Request;
-use Toxic\Dic;
+namespace Plib;
 
-/** @param array<string,string> $pageData */
-function toxic_view(array $pageData): string
+/**
+ * Simplified Random\Randomizer for older PHP versions
+ *
+ * @final
+ * @since 1.1
+ */
+class Random
 {
-    return Dic::makeTabCommand()(Request::current(), $pageData)();
+    /** @param int<1,max> $length */
+    public function bytes(int $length): string
+    {
+        return random_bytes($length);
+    }
 }

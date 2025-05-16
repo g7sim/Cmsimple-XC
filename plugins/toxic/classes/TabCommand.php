@@ -1,199 +1,74 @@
 <?php
 
 /**
- * The tab commands.
+ * Copyright (c) Christoph M. Becker
  *
- * PHP version 5
+ * This file is part of Toxic_XH.
  *
- * @category  CMSimple_XH
- * @package   Toxic
- * @author    Christoph M. Becker <cmbecker69@gmx.de>
- * @copyright 2014-2015 Christoph M. Becker <http://3-magi.net>
- * @license   http://www.gnu.org/licenses/gpl-3.0.en.html GNU GPLv3
- * @link      http://3-magi.net/?CMSimple_XH/Toxic_XH
+ * Toxic_XH is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Toxic_XH is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Toxic_XH.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * The tab commands.
- *
- * @category CMSimple_XH
- * @package  Toxic
- * @author   Christoph M. Becker <cmbecker69@gmx.de>
- * @license  http://www.gnu.org/licenses/gpl-3.0.en.html GNU GPLv3
- * @link     http://3-magi.net/?CMSimple_XH/Toxic_XH
- */
-class Toxic_TabCommand
+namespace Toxic;
+
+use Plib\Request;
+use Plib\Response;
+use Plib\View;
+
+class TabCommand
 {
-    /**
-     * The page data of the current page.
-     *
-     * @var array
-     */
-    protected $pageData;
+    /** @var array<string,string> */
+    private $conf;
 
-    /**
-     * Initializes a new instance.
-     *
-     * @param array $pageData An array of page data.
-     *
-     * @return void
-     */
-    public function __construct($pageData)
+    /** @var View */
+    private $view;
+
+    /** @param array<string,string> $conf */
+    public function __construct(array $conf, View $view)
     {
-        $this->pageData = $pageData;
+        $this->conf = $conf;
+        $this->view = $view;
+    }
+
+    /** @param array<string,string> $pageData */
+    public function __invoke(Request $request, array $pageData): Response
+    {
+        return Response::create($this->view->render("pdtab", [
+            "url" => $request->url()->relative(),
+            "category" => $pageData['toxic_category'],
+            "has_classes" => trim($this->conf["classes_available"]) !== "",
+            "available_classes" => $this->availableClasses($pageData),
+            "toxic_class" => $pageData['toxic_class'],
+        ]));
     }
 
     /**
-     * Renders the command.
-     *
-     * @return string (X)HTML.
-     *
-     * @global string The script name.
-     * @global string The selected URL.
+     * @param array<string,string> $pageData
+     * @return list<object{value:string,label:string,selected:string}>
      */
-    public function render()
+    private function availableClasses(array $pageData): array
     {
-        global $sn, $su;
-
-        return '<form id="toxic_tab" action="' . $sn . '?' . $su
-            . '" method="post">'
-            . $this->renderCategory()
-            . $this->renderClassField() . $this->renderButtons()
-            . '</form>';
-    }
-
-    /**
-     * Renders the category.
-     *
-     * @return string (X)HTML.
-     *
-     * @global array The localization of the core.
-     */
-    protected function renderCategory()
-    {
-        global $plugin_tx;
-
-        return '<p><label>' . $plugin_tx['toxic']['label_category'] . ' '
-            . tag(
-                'input type="text" name="toxic_category" value="'
-                . XH_hsc($this->pageData['toxic_category']) . '"'
-            )
-            . '</label></p>';
-    }
-
-    /**
-     * Renders the class field.
-     *
-     * @return string (X)HTML.
-     *
-     * @global array The localization of the plugins.
-     * @global array The configuration of the plugins.
-     */
-    protected function renderClassField()
-    {
-        global $plugin_tx, $plugin_cf;
-
-        $result = '<p><label>' . $plugin_tx['toxic']['label_class'] . ' ';
-        if ($plugin_cf['toxic']['classes_available'] == '') {
-            $result .= $this->renderClassInput();
-        } else {
-            $result .= $this->renderClassSelect();
+        $classes = $this->conf["classes_available"];
+        $classes = array_map("trim", explode(",", $classes));
+        array_unshift($classes, "");
+        $res = [];
+        foreach ($classes as $class) {
+            $res[] = (object) [
+                "value" => $class,
+                "label" => $class === "" ? $this->view->plain("label_none") : $class,
+                "selected" => $class === $pageData["toxic_class"] ? "selected" : "",
+            ];
         }
-        $result .= '</label></p>';
-        return $result;
-    }
-
-    /**
-     * Renders the class input element.
-     *
-     * @return string (X)HTML.
-     */
-    protected function renderClassInput()
-    {
-        return tag(
-            'input type="text" name="toxic_class" value="'
-            . $this->pageData['toxic_class'] . '"'
-        );
-    }
-
-    /**
-     * Renders the class select element.
-     *
-     * @return string (X)HTML.
-     */
-    protected function renderClassSelect()
-    {
-        return '<select name="toxic_class">' . $this->renderOptions()
-            . '</select>';
-    }
-
-    /**
-     * Renders the class option elements.
-     *
-     * @return string (X)HTML.
-     *
-     * @global array The localization of the plugins.
-     */
-    protected function renderOptions()
-    {
-        global $plugin_tx;
-
-        $result = '';
-        foreach ($this->getAvailableClasses() as $class) {
-            $result .= '<option';
-            if ($class == '') {
-                 $result .= ' label="' . $plugin_tx['toxic']['label_none'] . '"';
-            }
-            if ($class == $this->pageData['toxic_class']) {
-                $result .= ' selected="selected"';
-            }
-            $result .= '>' . $class . '</option>';
-        }
-        return $result;
-    }
-
-    /**
-     * Returns the available classes.
-     *
-     * @return array
-     *
-     * @global array The configuration of the plugins.
-     */
-    protected function getAvailableClasses()
-    {
-        global $plugin_cf;
-
-        $classes = $plugin_cf['toxic']['classes_available'];
-        $classes = explode(',', $classes);
-        array_unshift($classes, '');
-        return array_map('trim', $classes);
-    }
-
-    /**
-     * Renders the buttons.
-     *
-     * @return string ()XHTML.
-     */
-    protected function renderButtons()
-    {
-        return '<p class="toxic_tab_buttons">'
-            . $this->renderSubmitButton() . '</p>';
-    }
-
-    /**
-     * Renders the submit button.
-     *
-     * @return void
-     *
-     * @global array  The localization of the plugins.
-     */
-    protected function renderSubmitButton()
-    {
-        global $plugin_tx;
-
-        return '<button name="save_page_data">'
-            . $plugin_tx['toxic']['label_save'] . '</button>';
+        return $res;
     }
 }
-
-?>

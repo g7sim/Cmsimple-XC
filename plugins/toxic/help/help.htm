@@ -1,127 +1,91 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<meta http-equiv="content-type" content="text/html;charset=utf-8">
-<title>Toxic_XH - Manual</title>
-<link rel="stylesheet" type="text/css" href="./stylesheet.css">
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Twocents_XH – User Manual</title>
+  <style type="text/css">
+    body {
+        font-family: Georgia, serif;
+        line-height: 1.5;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 0.5em;
+        padding-right: 0.5em;
+        background: #ffffe1;
+        max-width: 32em;
+    }
+    p {
+        text-align: justify;
+    }
+    pre {
+        color: black;
+        background: #ffe;
+        overflow: auto;
+        padding: 0.2em 0.5em;
+        border: 1px solid silver;
+    }
+  </style>
 </head>
-
 <body>
-
-<h1>Toxic_XH - a CMSimple_XH Plugin</h1>
-<img src="../toxic.png" style="float: left; margin-right: 8px" alt="Ionizing
-radiation sign">
-<p>Toxic_XH facilitates to have enhanced TOCs (table of contents) on your site,
-which add features that are not available via CMSimple_XH's built-in toc() and
-li(), similar to those offered by <a
-href="http://cmsimplewiki.com/doku.php/addons/advanced_toc">AdvancedTOC</a> and
-<a href="http://cmsimplewiki.com/doku.php/addons/xtoc">xtoc</a>.</p>
-
-<ul id="nav">
-<li><a href="#notice">Important Notice</a></li>
+<h1 id="toxic_xh">Toxic_XH</h1>
+<p>Toxic_XH facilitates to have enhanced TOCs (table of contents) on your site, which add features that are not available via the built-in <code>toc()</code> and <code>li()</code> of CMSimple_XH, similar to those offered by the old AdvancedTOC and xtoc add-ons.</p>
+<ul>
 <li><a href="#requirements">Requirements</a></li>
+<li><a href="#download">Download</a></li>
 <li><a href="#installation">Installation</a></li>
 <li><a href="#settings">Settings</a></li>
 <li><a href="#usage">Usage</a></li>
-<!--<li><a href="#limitations">Limitations</a></li>-->
+<li><a href="#troubleshooting">Troubleshooting</a></li>
 <li><a href="#license">License</a></li>
 <li><a href="#credits">Credits</a></li>
 </ul>
-
-<div id="body">
-
-<p><strong>Please do read this documentation <em>before</em> you encounter any
-problems!</strong></p>
-
-<h2 id="notice">Important Notice</h2>
-<p><strong>Toxic_XH hasn't been tested so far in various environments. It is a
-so called alpha version. Use with utmost caution!</strong></p>
-<div class="toplink"><a href="#">back to top</a></div>
-
 <h2 id="requirements">Requirements</h2>
-<p>Toxic_XH is a plugin for CMSimple_XH. It requires CMSimple_XH &ge; 1.6 and
-PHP &ge; 5.1.2.</p>
-<div class="toplink"><a href="#">back to top</a></div>
-
+<p>Toxic_XH is a plugin for <a href="https://cmsimple-xh.org/">CMSimple_XH</a>. It requires CMSimple_XH ≥ 1.7.0 and PHP ≥ 7.1.0. Toxic_XH also requires <a href="https://github.com/cmb69/plib_xh">Plib_XH</a> ≥ 1.8; if that is not already installed (see <em>Settings</em>→<em>Info</em>), get the <a href="https://github.com/cmb69/plib_xh/releases/latest">lastest release</a>, and install it.</p>
+<h2 id="download">Download</h2>
+<p>The <a href="https://github.com/cmb69/toxic_xh/releases/latest">lastest release</a> is available for download on Github.</p>
 <h2 id="installation">Installation</h2>
-<p>The installation is done as with many other CMSimple_XH plugins.
-See the <a href="http://www.cmsimple-xh.org/wiki/doku.php/installation">
-CMSimple_XH wiki</a> for further details.</p>
-<ol>
+<p>The installation is done as with many other CMSimple_XH plugins.</p>
+<ol type="1">
 <li>Backup the data on your server.</li>
 <li>Unzip the distribution on your computer.</li>
-<li>Upload the whole directory toxic/ to your server into CMSimple_XH's
-plugins/ directory.</li>
-<li>Set write permissions to the subdirectories css/, config/ und
-languages/.</li>
-<!--<li>Browse to Toxic's administration (Plugins &rarr; Toxic), and
-check if all requirements are fulfilled.</li>-->
+<li>Upload the whole directory <code>toxic/</code> to your server into the <code>plugins/</code> directory of CMSimple_XH.</li>
+<li>Set write permissions to the subdirectories <code>css/</code>, <code>config/</code> and <code>languages/</code>.</li>
+<li>Browse to <code>Plugins</code> → <code>Toxic</code> in the back-end, and check whether all requirements are fulfilled.</li>
 </ol>
-<div class="toplink"><a href="#">back to top</a></div>
-
 <h2 id="settings">Settings</h2>
-<p>The plugin's configuration is done as with many other CMSimple_XH plugins in
-the website's back-end. Select Plugins &rarr; Toxic.</p>
-<p>You can change the default settings of Toxic_XH in "Config". Hints for the
-options will be displayed when hovering over the help icon with your mouse.</p>
-<p>Localization is done in "Language". You can translate the character strings
-to your own language if there is no appropriate language file available, or
-customize them according to your needs.</p>
-<p>The look of Toxic_XH can be customized in "Stylesheet".</p>
-<div class="toplink"><a href="#">back to top</a></div>
-
+<p>The configuration of the plugin is done as with many other CMSimple_XH plugins in the back-end of the Website. Go to <code>Plugins</code> → <code>Toxic</code>.</p>
+<p>You can change the default settings of Toxic_XH under <code>Config</code>. Hints for the options will be displayed when hovering over the help icon with your mouse.</p>
+<p>Localization is done under <code>Language</code>. You can translate the character strings to your own language if there is no appropriate language file available, or customize them according to your needs.</p>
+<p>The look of Toxic_XH can be customized under <code>Stylesheet</code>.</p>
 <h2 id="usage">Usage</h2>
-<p>Prepare your template by replacing the template tags</p>
-<pre>&lt;?php echo toc(&hellip;)?&gt;</pre>
+<p>Toxic_XH only works for templates which use the standard CMSimple_XH menu functions; custom menu functions which are used by some templates are not supported.</p>
+<p>To enable the enhanced Toxic_XH features, you need to replace the standard menu functions with the drop-in replacements of Toxic_XH, i.e. replace:</p>
+<pre><code>&lt;?=toc(…)?&gt;</code></pre>
 <p>with</p>
-<pre>&lt;?php echo toxic(&hellip;)?&gt;</pre>
-<p>and</p>
-<pre>&lt;?php echo li(&hellip;)?&gt;</pre>
+<pre><code>&lt;?=toxic(…)?&gt;</code></pre>
+<p>and/or</p>
+<pre><code>&lt;?=li(…)?&gt;</code></pre>
 <p>with</p>
-<pre>&lt;?php echo toxic_li(&hellip;)?&gt;</pre>
-<p>This enables the settings in the page data tab "Toxic" which you can define
-for each individual page.</p>
-<p>You can enter a catogory for any page, which means that this very page is the
-first page of the category. The category itself is put as separate menu item
-into the menu and has purely informational or visual character, but not
-functional (for instance, the category is not a link). Each category item has
-the CSS class toxic_category, which you can use to style it. Note that the
-category entry accepts arbitrary (X)HTML markup, so you could use an image
-instead of text for the category.</p>
-<p>You can choose an individual CSS class for each menu item, which will be
-available on the respective list item (&lt;li&gt;) in addition to the
-CMSimple_XH standard CSS class (s)doc(s). You can then add respective rules to
-the template's stylesheet, to design the menu item according to your wishes.</p>
-<div class="toplink"><a href="#">back to top</a></div>
-
-<!--<h2 id="limitations">Limitations</h2>
-<div class="toplink"><a href="#">back to top</a></div>-->
-
+<pre><code>&lt;?=toxic_li(…)?&gt;</code></pre>
+<p>and/or</p>
+<pre><code>&lt;?=submenu(…)?&gt;</code></pre>
+<p>with</p>
+<pre><code>&lt;?=toxic_submenu(…)?&gt;</code></pre>
+<p>This enables the settings in the page data tab <code>Toxic</code> which you can define for each individual page.</p>
+<p>You can enter a catogory for any page, which means that this very page is the first page of the category. The category itself is put as separate menu item into the menu and has purely informational or visual character, but not functional (for instance, the category is not a link). Each category item has the CSS class <code>toxic_category</code>, which you can use to style it. Note that the category entry accepts arbitrary HTML markup, so you could use an image instead of text for the category.</p>
+<p>You can choose an individual CSS class for each menu item, which will be available on the respective list item (<code>&lt;li&gt;</code>) in addition to the CMSimple_XH standard CSS class <code>sdoc</code>/<code>sdocs</code>/<code>doc</code>/<code>docs</code>. You can then add respective rules to the stylesheet of the template, to design the menu item according to your wishes.</p>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<p>Report bugs and ask for support either on <a href="https://github.com/cmb69/toxic_xh/issues">Github</a> or in the <a href="https://cmsimpleforum.com/">CMSimple_XH Forum</a>.</p>
 <h2 id="license">License</h2>
-<p>Toxic_XH is licensed under
-<a href="http://www.gnu.org/licenses/gpl.html">GPLv3</a>.</p>
-<p>&copy; 2014-2015 Christoph M. Becker</p>
-<div class="toplink"><a href="#">back to top</a></div>
-
+<p>Toxic_XH is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</p>
+<p>Toxic_XH is distributed in the hope that it will be useful, but without any warranty; without even the implied warranty of merchantibility or fitness for a particular purpose. See the GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License along with Toxic_XH. If not, see https://www.gnu.org/licenses/.</p>
+<p>Copyright 1999-2009 Peter Harteg<br> Copyright 2014 <a href="https://cmsimple-xh.org/?The_Team">The CMSimple_XH developers</a><br> Copyright © Christoph M. Becker</p>
 <h2 id="credits">Credits</h2>
-<p>The plugin icon is designed by <a
-href="https://code.google.com/u/newmooon/">new mooon</a>. Many thanks for
-publishing this icon under GPL.</p>
-<!--<p>This plugin uses free applications icons from <a
-href="http://www.aha-soft.com/">Aha-Soft</a>. Many thanks to making these icons
-freely available.</p>-->
-<!--<p>Many thanks to the community at the <a
-href="http://www.cmsimpleforum.com/">CMSimple_XH forum</a> for tips, suggestions
-and testing.</p>-->
-<p>And last but not least many thanks to <a href="http://harteg.dk/">Peter
-Harteg</a>, the "father" of CMSimple, and all developers of <a
-href="http://www.cmsimple-xh.org/"> CMSimple_XH</a> without whom this amazing
-CMS wouldn't exist.</p>
-<div class="toplink"><a href="#">back to top</a></div>
-
-</div>
-
+<p>The plugin icon is designed by <a href="https://code.google.com/u/newmooon/">new mooon</a>. Many thanks for publishing this icon under GPL.</p>
+<p>Many thanks to the community at the <a href="http://www.cmsimpleforum.com/">CMSimple_XH Forum</a> for tips, suggestions and testing. Especially, I like to thank <em>manu</em>, who triggered resuming of the plugin developement via a question regarding <code>toc()</code>.</p>
+<p>And last but not least many thanks to <a href="http://www.harteg.dk/">Peter Harteg</a>, the “father” of CMSimple, and all developers of <a href="https://www.cmsimple-xh.org/">CMSimple_XH</a> without whom this amazing CMS would not exist.</p>
 </body>
-
 </html>

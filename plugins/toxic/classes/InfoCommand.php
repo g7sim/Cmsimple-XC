@@ -1,116 +1,92 @@
 <?php
 
 /**
- * The info commands.
+ * Copyright (c) Christoph M. Becker
  *
- * PHP version 5
+ * This file is part of Toxic_XH.
  *
- * @category  CMSimple_XH
- * @package   Toxic
- * @author    Christoph M. Becker <cmbecker69@gmx.de>
- * @copyright 2014-2015 Christoph M. Becker <http://3-magi.net>
- * @license   http://www.gnu.org/licenses/gpl-3.0.en.html GNU GPLv3
- * @link      http://3-magi.net/?CMSimple_XH/Toxic_XH
+ * Toxic_XH is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Toxic_XH is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Toxic_XH.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * The info commands.
- *
- * @category CMSimple_XH
- * @package  Toxic
- * @author   Christoph M. Becker <cmbecker69@gmx.de>
- * @license  http://www.gnu.org/licenses/gpl-3.0.en.html GNU GPLv3
- * @link     http://3-magi.net/?CMSimple_XH/Toxic_XH
- */
-class Toxic_InfoCommand
+namespace Toxic;
+
+use Plib\Response;
+use Plib\SystemChecker;
+use Plib\View;
+
+class InfoCommand
 {
-    /**
-     * Renders the info view.
-     *
-     * @return string (X)HTML.
-     */
-    public function render()
+    /** @var string */
+    private $pluginFolder;
+
+    /** @var SystemChecker */
+    private $systemChecker;
+
+    /** @var View */
+    private $view;
+
+    public function __construct(string $pluginFolder, SystemChecker $systemChecker, View $view)
     {
-        return $this->renderHeading()
-            . $this->renderLogo() . $this->renderVersion()
-            . $this->renderCopyright() . $this->renderLicense();
+        $this->pluginFolder = $pluginFolder;
+        $this->systemChecker = $systemChecker;
+        $this->view = $view;
     }
 
-    /**
-     * Renders the heading.
-     *
-     * @return string (X)HTML.
-     *
-     * @global array The localization of the plugins.
-     */
-    protected function renderHeading()
+    public function __invoke(): Response
     {
-        global $plugin_tx;
-
-        return '<h1>Toxic &ndash; ' . $plugin_tx['toxic']['caption_info']
-            . '</h1>';
+        return Response::create("<h1>Toxic " . Dic::VERSION . "</h1>\n"
+            . "<h2>" . $this->view->text("syscheck_heading") . "</h2>\n"
+            . $this->systemChecks());
     }
 
-    /**
-     * Renders the logo.
-     *
-     * @return string (X)HTML.
-     *
-     * @global array The paths of system files and folders.
-     * @global array The localization of the plugins.
-     */
-    protected function renderLogo()
+    private function systemChecks(): string
     {
-        global $pth, $plugin_tx;
-
-        return tag(
-            'img class="toxic_logo" src="' . $pth['folder']['plugins']
-            . 'toxic/toxic.png" alt="' . $plugin_tx['toxic']['alt_logo'] . '"'
+        $checks = [];
+        $version = "7.1.0";
+        $state = $this->systemChecker->checkVersion(PHP_VERSION, $version);
+        $checks[] = $this->view->message(
+            $state ? "success" : "fail",
+            "syscheck_phpversion",
+            $version,
+            $this->view->plain("syscheck_" . ($state ? "good" : "bad"))
         );
-    }
-
-    /**
-     * Renders the version information.
-     *
-     * @return string (X)HTML.
-     */
-    protected function renderVersion()
-    {
-        return '<p>Version: ' . TOXIC_VERSION . '</p>';
-    }
-
-    /**
-     * Renders the copyright information.
-     *
-     * @return string (X)HTML.
-     */
-    protected function renderCopyright()
-    {
-        return '<p>Copyright &copy; 2014-2015'
-            . ' <a href="http://3-magi.net/">Christoph M. Becker</a>';
-    }
-
-    /**
-     * Renders the license information.
-     *
-     * @return string (X)HTML.
-     */
-    protected function renderLicense()
-    {
-        return <<<EOT
-<p class="toxic_license">This program is free software: you can
-redistribute it and/or modify it under the terms of the GNU General Public
-License as published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.</p>
-<p class="toxic_license">This program is distributed in the hope that it will be
-useful, but <em>without any warranty</em>; without even the implied warranty of
-<em>merchantability</em> or <em>fitness for a particular purpose</em>. See the
-GNU General Public License for more details.</p>
-<p class="toxic_license">You should have received a copy of the GNU
-General Public License along with this program. If not, see <a
-href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>.</p>
-EOT;
+        $version = "1.7.0";
+        $state = $this->systemChecker->checkVersion(CMSIMPLE_XH_VERSION, "CMSimple_XH $version");
+        $checks[] = $this->view->message(
+            $state ? "success" : "fail",
+            "syscheck_xhversion",
+            $version,
+            $this->view->plain("syscheck_" . ($state ? "good" : "bad"))
+        );
+        $version = "1.8";
+        $state = $this->systemChecker->checkPlugin("plib", $version);
+        $checks[] = $this->view->message(
+            $state ? "success" : "fail",
+            "syscheck_plibversion",
+            $version,
+            $this->view->plain("syscheck_" . ($state ? "good" : "bad"))
+        );
+        foreach (["config", "css", "languages"] as $folder) {
+            $folder = $this->pluginFolder . $folder;
+            $state = $this->systemChecker->checkWritability($folder);
+            $checks[] = $this->view->message(
+                $state ? "success" : "warning",
+                "syscheck_writable",
+                $folder,
+                $this->view->plain("syscheck_" . ($state ? "good" : "bad"))
+            );
+        }
+        return implode("", $checks);
     }
 }
-
-?>

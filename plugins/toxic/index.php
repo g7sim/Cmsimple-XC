@@ -1,72 +1,52 @@
 <?php
 
 /**
- * The plugin entry.
+ * Copyright (c) Christoph M. Becker
  *
- * PHP version 5
+ * This file is part of Toxic_XH.
  *
- * @category  CMSimple_XH
- * @package   Toxic
- * @author    Christoph M. Becker <cmbecker69@gmx.de>
- * @copyright 2014-2015 Christoph M. Becker <http://3-magi.net>
- * @license   http://www.gnu.org/licenses/gpl-3.0.en.html GNU GPLv3
- * @link      http://3-magi.net/?CMSimple_XH/Toxic_XH
+ * Toxic_XH is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Toxic_XH is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Toxic_XH.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * Prevent direct access and usage from unsupported CMSimple_XH versions.
- */
-if (!defined('CMSIMPLE_XH_VERSION')
-    || strpos(CMSIMPLE_XH_VERSION, 'CMSimple_XH') !== 0
-    || version_compare(CMSIMPLE_XH_VERSION, 'CMSimple_XH 1.6', 'lt')
-) {
-    header('HTTP/1.1 403 Forbidden');
-    header('Content-Type: text/plain; charset=UTF-8');
-    die(<<<EOT
-Toxic_XH detected an unsupported CMSimple_XH version.
-Uninstall Toxic_XH or upgrade to a supported CMSimple_XH version!
-EOT
-    );
+use Plib\Request;
+use Toxic\Dic;
+use XH\PageDataRouter;
+
+if (!defined("CMSIMPLE_XH_VERSION")) {
+    http_response_code(403);
+    exit;
 }
 
-/**
- * The plugin version.
- */
-define('TOXIC_VERSION', '1alpha1');
-
-/**
- * Returns a table of contents.
- *
- * @param int $start The menu level to start with.
- * @param int $end   The menu level to end with.
- *
- * @return string (X)HTML.
- */
-function toxic($start = null, $end = null)
+function toxic(?int $start = null, ?int $end = null): string
 {
     return toc($start, $end, 'Toxic_li');
 }
 
-/**
- * Returns a menu structure of the pages.
- *
- * @param array $ta The indexes of the pages.
- * @param mixed $st The menu level to start with or the type of menu.
- *
- * @return string The (X)HTML.
- */
-function Toxic_li($ta, $st)
+/** @param list<int> $ta */
+function toxic_li(array $ta, int $st): string
 {
-    $liCommand = new Toxic_LiCommand($ta, $st);
-    return $liCommand->render();
+    return Dic::menuCommand()(Request::current(), $ta, $st)();
+}
+
+function toxic_submenu(string $html = ""): string
+{
+    return Dic::submenuCommand()(Request::current(), $html)();
 }
 
 /**
- * The controller.
+ * @var PageDataRouter $pd_router
  */
-$_Toxic_controller = new Toxic_Controller(
-    new Toxic_CommandFactory()
-);
-$_Toxic_controller->dispatch();
 
-?>
+$pd_router->add_interest("toxic_category");
+$pd_router->add_interest("toxic_class");
