@@ -4,9 +4,8 @@
  * @file cms.php
  *
  * The main file of CMSimple_XH.
- *
- * @category  CMSimple_XH
- * @package   XH
+ * @category  CMSimple_XC
+ * @package   XC
  * @author    Peter Harteg <peter@harteg.dk>
  * @author    The CMSimple_XH developers <devs@cmsimple-xh.org>
  * @copyright 1999-2009 Peter Harteg
@@ -206,15 +205,15 @@ $j = null;
 /**
  * The version in textual representation, e.g. CMSimple_XH 1.6
  */
-define('CMSIMPLE_XH_VERSION', 'CMSimple_XH 1.7.3');
+define('CMSIMPLE_XH_VERSION', 'CMSimple_XH 1.7.5');
 /**
  * The build number as integer: YYYYMMDDBB
  */
-define('CMSIMPLE_XH_BUILD', '2020072101');
+define('CMSIMPLE_XH_BUILD', '2025051504');
 /**
  * The release date in ISO 8601 format: YYYY-MM-DD
  */
-define('CMSIMPLE_XH_DATE', '2020-07-21');
+define('CMSIMPLE_XH_DATE', '2025-05-15');
 
 /**
  * A two dimensional array that holds the paths of important files and folders.
