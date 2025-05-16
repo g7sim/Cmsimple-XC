@@ -495,16 +495,16 @@ div.pl_tooltip img {
     border: 1px solid #888;
     padding: 1px 3px 2px 3px;
     background-color: #ddd;
-    background-image: linear-gradient(to bottom, #eee, #ccc);
+    background-image: linear-gradient(to bottom, #fff, #eee);
     border-bottom: none;
-    border-radius: 5px 5px 0 0;
+    border-radius: 3px 3px 0 0;
 }
 
 #xh_pdtabs a:hover {
     color: red;
     cursor: pointer;
     background-color: #cde;
-    background-image: linear-gradient(to bottom, #def, #bcd);
+    background-image: linear-gradient(to bottom, #eee, #ddd);
 }
 
 #xh_pdtabs .xh_active_tab,
