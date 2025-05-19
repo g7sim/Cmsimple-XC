@@ -1,6 +1,6 @@
 <?php
 
-use Coco\Infra\View;
+use Plib\View;
 
 if (!defined("CMSIMPLE_XH_VERSION")) {header("HTTP/1.0 403 Forbidden"); exit;}
 
@@ -15,11 +15,11 @@ if (!defined("CMSIMPLE_XH_VERSION")) {header("HTTP/1.0 403 Forbidden"); exit;}
  */
 ?>
 <!-- coco edit -->
-<form action="" method="POST">
-  <input type="hidden" name="xh_csrf_token" value="<?=$csrf_token?>">
-  <textarea id="<?=$id?>" name="coco_text_<?=$name?>" style="<?=$style?>"><?=$content?></textarea>
+<form method="post">
+  <input type="hidden" name="xh_csrf_token" value="<?=$this->esc($csrf_token)?>">
+  <textarea id="<?=$this->esc($id)?>" name="coco_text_<?=$this->esc($name)?>" style="<?=$this->esc($style)?>"><?=$this->esc($content)?></textarea>
 <?if ($editor):?>
-  <script type="text/javascript"><?=$editor?></script>
+  <script><?=$this->raw($editor)?></script>
 <?else:?>
   <input type="submit" class="submit" value="<?=$this->text("label_save")?>">
 <?endif?>

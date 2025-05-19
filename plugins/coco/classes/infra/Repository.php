@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2012-2023 Christoph M. Becker
+ * Copyright (c) Christoph M. Becker
  *
  * This file is part of Coco_XH.
  *
@@ -22,10 +22,8 @@
 namespace Coco\Infra;
 
 use Coco\Logic\Util;
+use Plib\Random;
 
-/**
- * @phpstan-import-type BackupName from Util
- */
 class Repository
 {
     /** @var string */
@@ -37,15 +35,15 @@ class Repository
     /** @var Pages */
     private $pages;
 
-    /** @var IdGenerator */
-    private $idGenerator;
+    /** @var Random */
+    private $random;
 
-    public function __construct(string $dataFolder, string $contentFile, Pages $pages, IdGenerator $idGenerator)
+    public function __construct(string $dataFolder, string $contentFile, Pages $pages, Random $random)
     {
         $this->dataFolder = $dataFolder;
         $this->contentFile = $contentFile;
         $this->pages = $pages;
-        $this->idGenerator = $idGenerator;
+        $this->random = $random;
     }
 
     public function dataFolder(): string
@@ -59,6 +57,11 @@ class Repository
 
     public function filename(string $name, ?string $date = null): string
     {
+        return $this->dataFolder() . ($date !== null ? "{$date}_" : "") . "$name.2.1.htm";
+    }
+
+    public function oldFilename(string $name, ?string $date = null): string
+    {
         return $this->dataFolder() . ($date !== null ? "{$date}_" : "") . "$name.htm";
     }
 
@@ -69,6 +72,20 @@ class Repository
             return Util::isCocoFilename($filename) && !Util::isBackup($filename);
         };
         $namer = function ($filename) {
+            return basename($filename, '.2.1.htm');
+        };
+        return $this->doFindAllNames($predicate, $namer, function ($a, $b) {
+            return $a <=> $b;
+        });
+    }
+
+    /** @return list<string> */
+    public function findAllOldNames(): array
+    {
+        $predicate = function ($filename) {
+            return Util::isOldCocoFilename($filename) && !Util::isBackup($filename);
+        };
+        $namer = function ($filename) {
             return basename($filename, '.htm');
         };
         return $this->doFindAllNames($predicate, $namer, function ($a, $b) {
@@ -76,7 +93,7 @@ class Repository
         });
     }
 
-    /** @return list<BackupName> */
+    /** @return list<array{string,string}> */
     public function findAllBackups(string $coconame): array
     {
         $predicate = function ($filename) use ($coconame) {
@@ -137,7 +154,8 @@ class Repository
         return Util::cocoContent($text, $pd['coco_id']);
     }
 
-    public function save(string $name, int $index, string $text): bool
+    /** @throws RepositoryException */
+    public function save(string $name, int $index, string $text): void
     {
         $oldContent = $this->readContents($name);
         $content = "<html>\n<body>\n";
@@ -150,17 +168,68 @@ class Repository
         }
         $content .= "</body>\n</html>\n";
         $filename = $this->filename($name);
-        if (is_dir($filename) || XH_writeFile($filename, $content) === false) {
-            return false;
+        if (is_dir($filename) || !$this->writeFile($filename, $content)) {
+            throw new RepositoryException("can't save");
         }
         touch($this->contentFile);
-        return true;
+    }
+
+    /** @throws RepositoryException */
+    public function migrate(string $name): void
+    {
+        $oldContent = $this->readOldContents($name);
+        $content = "<html>\n<body>\n";
+        for ($i = 0; $i < $this->pages->count(); $i++) {
+            if (($id = $this->cocoId($i, false)) === null) {
+                continue;
+            }
+            $content .= $this->headingLine($this->pages->level($i), $id, $this->pages->heading($i)) . "\n"
+                . Util::oldCocoContent($oldContent, $id) . "\n";
+        }
+        $content .= "</body>\n</html>\n";
+        $filename = $this->filename($name);
+        if (is_dir($filename) || !$this->writeFile($filename, $content)) {
+            throw new RepositoryException("can't save");
+        }
+    }
+
+    private static function writeFile(string $filename, string $content): bool
+    {
+        $res = false;
+        if (($stream = fopen($filename, "cb"))) {
+            if (flock($stream, LOCK_EX)) {
+                ftruncate($stream, 0);
+                $res = fwrite($stream, $content) !== false;
+                flock($stream, LOCK_UN);
+            }
+            fclose($stream);
+        }
+        return $res;
     }
 
     private function readContents(string $coconame): string
     {
         $filename = $this->filename($coconame);
-        return is_file($filename) && is_readable($filename) ? (string) XH_readFile($filename) : "";
+        return is_file($filename) && is_readable($filename) ? $this->readFile($filename) : "";
+    }
+
+    private function readOldContents(string $coconame): string
+    {
+        $filename = $this->oldFilename($coconame);
+        return is_file($filename) && is_readable($filename) ? $this->readFile($filename) : "";
+    }
+
+    private static function readFile(string $filename): string
+    {
+        $res = "";
+        if (($stream = fopen($filename, "rb"))) {
+            if (flock($stream, LOCK_SH)) {
+                $res = (string) stream_get_contents($stream);
+                flock($stream, LOCK_UN);
+            }
+            fclose($stream);
+        }
+        return $res;
     }
 
     private function cocoId(int $index, bool $current): ?string
@@ -170,15 +239,27 @@ class Repository
             if (!$current) {
                 return null;
             }
-            $pd["coco_id"] = $this->idGenerator->newId();
+            $pd["coco_id"] = $this->newId();
             $this->pages->updateData($index, $pd);
         }
         return $pd["coco_id"];
     }
 
+    private function newId(): string
+    {
+        $rand = $this->random->bytes(16);
+        $rand[6] = chr(ord($rand[6]) & 0x0f | 0x40);
+        $rand[8] = chr(ord($rand[8]) & 0x3f | 0x80);
+        $uuid = strtoupper(bin2hex($rand));
+        return substr($uuid, 0, 8) . "-" . substr($uuid, 8, 4) . "-"
+            . substr($uuid, 12, 4) . "-" . substr($uuid, 16, 4) . "-"
+            . substr($uuid, 20, 12);
+    }
+
     private function headingLine(int $level, string $id, string $heading): string
     {
-        return "<h$level id=\"$id\">$heading</h$level>";
+        return "<!--Coco_ml$level($heading):$id-->";
+        // return "<h$level id=\"$id\">$heading</h$level>";
     }
 
     private function content(bool $current, string $id, string $text, string $oldContent): string
@@ -193,13 +274,19 @@ class Repository
         return "";
     }
 
-    public function backup(string $coconame, string $date): bool
+    /** @throws RepositoryException */
+    public function backup(string $coconame, string $date): void
     {
-        return copy($this->filename($coconame), $this->filename($coconame, $date));
+        if (!copy($this->filename($coconame), $this->filename($coconame, $date))) {
+            throw new RepositoryException("can't backup");
+        }
     }
 
-    public function delete(string $coconame, ?string $date = null): bool
+    /** @throws RepositoryException */
+    public function delete(string $coconame, ?string $date = null): void
     {
-        return unlink($this->filename($coconame, $date));
+        if (!unlink($this->filename($coconame, $date))) {
+            throw new RepositoryException("can't delete");
+        }
     }
 }

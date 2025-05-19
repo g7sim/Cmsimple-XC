@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2023 Christoph M. Becker
+ * Copyright (c) Christoph M. Becker
  *
  * This file is part of Coco_XH.
  *
@@ -21,9 +21,6 @@
 
 namespace Coco\Logic;
 
-/**
- * @phpstan-type BackupName array{string,string}
- */
 class Util
 {
     public static function isValidCocoName(string $name): bool
@@ -31,13 +28,12 @@ class Util
         return (bool) preg_match('/^[a-z_0-9]+$/u', $name);
     }
 
-    /** @return list<string> */
-    public static function parseSearchTerm(string $searchTerm): array
+    public static function isCocoFilename(string $filename): bool
     {
-        return preg_split('/\s+/iu', $searchTerm, 0, PREG_SPLIT_NO_EMPTY) ?: [];
+        return (bool) preg_match('/^[a-z_0-9]+\.2\.1\.htm$/u', $filename);
     }
 
-    public static function isCocoFilename(string $filename): bool
+    public static function isOldCocoFilename(string $filename): bool
     {
         return (bool) preg_match('/^[a-z_0-9]+\.htm$/u', $filename);
     }
@@ -49,11 +45,13 @@ class Util
         return (bool) preg_match(sprintf('/^\d{8}_\d{6}_%s\.htm$/u', $name), $filename);
     }
 
-    /** @return BackupName */
+    /** @return array{string,string} */
     public static function backupName(string $filename): array
     {
         assert(self::isBackup($filename));
         preg_match('/^(\d{8}_\d{6})_([a-z_0-9]+)\.htm$/u', $filename, $matches);
+        assert(isset($matches[1]));
+        assert(isset($matches[2]));
         return [$matches[2], $matches[1]];
     }
 
@@ -65,7 +63,7 @@ class Util
     public static function cocoContent(string $content, string $id): string
     {
         $pattern = sprintf(
-            '/<h[1-9][^>]+id="%s"[^>]*>[^<]*<\/h[1-9]>(.*?)<(?:h[1-9]|\/body)/isu',
+            '/<!--Coco_ml(?:.*?):%s-->(.*?)<(?:!--Coco_ml|\/body)/isu',
             preg_quote($id, "/")
         );
         if (!preg_match($pattern, $content, $matches)) {
@@ -74,15 +72,15 @@ class Util
         return trim($matches[1]);
     }
 
-    /** @param list<string> $words */
-    public static function textContainsAllWords(string $text, array $words): bool
+    public static function oldCocoContent(string $content, string $id): string
     {
-        $text = utf8_strtolower($text);
-        foreach ($words as $word) {
-            if (strpos($text, utf8_strtolower($word)) === false) {
-                return false;
-            }
+        $pattern = sprintf(
+            '/<h[1-9][^>]+id="%s"[^>]*>[^<]*<\/h[1-9]>(.*?)<(?:h[1-9][^>]+id=|\/body)/isu',
+            preg_quote($id, "/")
+        );
+        if (!preg_match($pattern, $content, $matches)) {
+            return "";
         }
-        return true;
+        return trim($matches[1]);
     }
 }

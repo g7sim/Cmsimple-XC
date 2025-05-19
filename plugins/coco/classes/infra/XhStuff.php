@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2023 Christoph M. Becker
+ * Copyright (c) Christoph M. Becker
  *
  * This file is part of Coco_XH.
  *
@@ -21,7 +21,6 @@
 
 namespace Coco\Infra;
 
-/** @codeCoverageIgnore */
 class XhStuff
 {
     public function evaluateScripting(string $text): string

@@ -1,24 +1,5 @@
 <?php
 
-/**
- * Copyright 2023 Christoph M. Becker
- *
- * This file is part of Coco_XH.
- *
- * Coco_XH is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Coco_XH is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Coco_XH.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 namespace Coco\Logic;
 
 use PHPUnit\Framework\TestCase;
@@ -42,23 +23,6 @@ class UtilTest extends TestCase
         ];
     }
 
-    /** @dataProvider searchTerms */
-    public function testParseSearchTerm(string $searchTerm, array $expected): void
-    {
-        $words = Util::parseSearchTerm($searchTerm);
-        $this->assertEquals($expected, $words);
-    }
-
-    public function searchTerms(): array
-    {
-        return [
-            ["", []],
-            [" ", []],
-            ["one two", ["one", "two"]],
-            ["  one  two  ", ["one", "two"]],
-        ];
-    }
-
     /** @dataProvider cocoFilenames */
     public function testIsCocoFilename(string $filename, bool $expected): void
     {
@@ -67,6 +31,23 @@ class UtilTest extends TestCase
     }
 
     public function cocoFilenames(): array
+    {
+        return [
+            ["test.2.1.htm", true],
+            ["something else.2.1.htm", false],
+            ["test.txt", false],
+            ["20230310_131500_test.2.1.htm", true],
+        ];
+    }
+
+    /** @dataProvider oldCocoFilenames */
+    public function testIsOldCocoFilename(string $filename, bool $expected): void
+    {
+        $result = Util::isOldCocoFilename($filename);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function oldCocoFilenames(): array
     {
         return [
             ["test.htm", true],
@@ -123,33 +104,49 @@ class UtilTest extends TestCase
     public function cocoContents(): array
     {
         $content = <<<EOT
+            <html>
+            <body>
+            <!--Coco_ml1(Blah):123456-->
+            <p>some co-content</p>
+            <!--Coco_ml2(Yada Yada):234567-->
+            <p>some other co-content</p>
+            <h1>Blub</h1>
+            <p>some content without ID</p>
+            </body>
+            </html>
+            EOT;
+        return [
+            [$content, "123456", "<p>some co-content</p>"],
+            [$content, "234567", "<p>some other co-content</p>\n<h1>Blub</h1>\n<p>some content without ID</p>"],
+            [$content, "345678", ""],
+        ];
+    }
+
+    /** @dataProvider oldCocoContents */
+    public function testOldCocoContent(string $content, string $id, string $expected): void
+    {
+        $result = Util::oldCocoContent($content, $id);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function oldCocoContents(): array
+    {
+        $content = <<<EOT
+            <html>
+            <body>
             <h1 id="123456">Blah</h1>
             <p>some co-content</p>
             <h2 id="234567">Yada Yada</h2>
             <p>some other co-content</p>
             <h1>Blub</h1>
             <p>some content without ID</p>
+            </body>
+            </html>
             EOT;
         return [
             [$content, "123456", "<p>some co-content</p>"],
-            [$content, "234567", "<p>some other co-content</p>"],
+            [$content, "234567", "<p>some other co-content</p>\n<h1>Blub</h1>\n<p>some content without ID</p>"],
             [$content, "345678", ""],
-        ];
-    }
-
-    /** @dataProvider textWords */
-    public function testTextContainsAllWords(string $text, array $words, bool $expected): void
-    {
-        $result = Util::textContainsAllWords($text, $words);
-        $this->assertEquals($expected, $result);
-    }
-
-    public function textWords(): array
-    {
-        return [
-            ["some Text which contains all words", ["text", "Words"], true],
-            ["some text which doesn't contain all", ["text", "words"], false],
-            ["some text", [], true],
         ];
     }
 }

@@ -4,8 +4,8 @@ Coco_XH facilitates to have an arbitrary amount of
 so called co-contents on your website.
 These are similar to newsboxes,
 but instead have different content for every page.
-Coco_XH is inspired by the
-[Also plugin](http://cmsimplewiki-com.keil-portal.de/doku.php?id=plugins:also),
+Coco_XH is inspired by the old
+Also plugin,
 but allows editing with the chosen editor instead of a
 textarea and scripting to be used.
 
@@ -23,7 +23,11 @@ textarea and scripting to be used.
 ## Requirements
 
 Coco_XH is a plugin for [CMSimple_XH](https://www.cmsimple-xh.org/).
-It requires CMSimple_XH ≥ 1.7.0 and PHP ≥ 7.0.0.
+It requires CMSimple_XH ≥ 1.7.0 and PHP ≥ 7.1.0.
+Coco_XH also requires [Plib_XH](https://github.com/cmb69/plib_xh) ≥ 1.6;
+if that is not already installed (see `Settings` → `Info`),
+get the [lastest release](https://github.com/cmb69/plib_xh/releases/latest),
+and install it.
 
 ## Download
 
@@ -63,7 +67,7 @@ modifying the template and its stylesheet.
 
 To have co-content on your site, just insert in your template
 
-    <?php echo coco('my_content');?>
+    <?=coco('my_content');?>
 
 in the place where you want, e.g. instead of a newsbox.
 Instead of `my_content` you can choose any name,
@@ -81,11 +85,9 @@ If you want to use another toolbar than the one
 you have configured for the main content editor,
 just give the name of the toolbar as second parameter, e.g.
 
-    <?php echo coco('small_content', 'sidebar');?>
+    <?=coco('small_content', 'sidebar');?>
 
 As toolbars, usually "full", "medium", "minimal" and "sidebar" are available.
-How to customize the TinyMCE toolbars is explained in the
-[CMSimple_XH Wiki](https://wiki.cmsimple-xh.org/doku.php/tinymce#customization),
 
 The screenshot below shows the co-contents in edit mode:
 
@@ -95,25 +97,23 @@ The width and height of the textarea and the editor, respectively,
 default to 100% of its container.
 The height can be changed by a third parameter to the `coco()` call, e.g.
 
-    <?php echo coco('my_content', 'sidebar', '500px');?>
+    <?=coco('my_content', 'sidebar', '500px');?>
 
 If you pass this parameter, it's mandatory to give the toolbar parameter too.
 If you want to stick with the default toolbar, you can write:
 
-    <?php echo coco('my_content', false, '500px');?>
+    <?=coco('my_content', false, '500px');?>
 
 If you want to change the width, you can do so in the stylesheet.
+
 The co-contents are stored in the subfolder `coco/` of the `content/` folder
 of CMSimple_XH in an HTML file with the name given as first parameter,
-e.g. `my_content.htm`.
-The structure is similar to that of the content.htm file of CMSimple_XH 1.7 and up,
-but for historic reasons,
-the pages are separated by `<h1>`, `<h2>` … `<h9>` according to their menu level,
-instead of respective HTML comments.
-The names of the page headings are inserted for better readability only;
+e.g. `my_content.2.1.htm`.
+The structure is similar to that of the content.htm file of CMSimple_XH 1.7 and up.
+The names and levels of the page headings are inserted for better readability only;
 they are ignored by Coco_XH.
-Instead the link to the page is made with the id given for the heading.
-You must not alter these ids in any way!
+Instead the link to the page is made with the ID given for the heading.
+You must not alter these IDs in any way!
 Creating new pages by inserting new headings is not possible;
 these will simply be ignored.
 
@@ -157,15 +157,15 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Coco_XH.  If not, see <https://www.gnu.org/licenses/>.
 
-Copyright 2012-2023 Christoph M. Becker
+Copyright © Christoph M. Becker
 
-Slovak translation © 2012 Dr. Martin Sereday  
-Czech translation © 2012 Josef Němec  
+Slovak translation © Dr. Martin Sereday<br>
+Czech translation © Josef Němec  
 
 ## Credits
 
 Coco_XH was inspired by Ricardo Serpell’s
-[Also plugin](https://cmsimplewiki-com.keil-portal.de/doku.php?id=plugins:also).
+Also plugin.
 
 The plugin icon is designed by [Andy Gongea](https://gongea.com/).
 Many thanks for publishing this icon as freeware.

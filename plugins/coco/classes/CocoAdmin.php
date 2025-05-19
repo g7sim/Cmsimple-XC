@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2012-2023 Christoph M. Becker
+ * Copyright (c) Christoph M. Becker
  *
  * This file is part of Coco_XH.
  *
@@ -21,11 +21,12 @@
 
 namespace Coco;
 
-use Coco\Infra\CsrfProtector;
 use Coco\Infra\Repository;
-use Coco\Infra\Request;
-use Coco\Infra\View;
-use Coco\Value\Response;
+use Coco\Infra\RepositoryException;
+use Plib\CsrfProtector;
+use Plib\Request;
+use Plib\Response;
+use Plib\View;
 
 class CocoAdmin
 {
@@ -47,21 +48,53 @@ class CocoAdmin
 
     public function __invoke(Request $request): Response
     {
-        switch ($request->cocoAdminAction()) {
+        switch ($this->action($request)) {
             default:
-                return $this->show($request);
+                return $this->show();
+            case "migrate":
+                return $this->confirmMigrate($request);
             case "delete":
                 return $this->confirmDelete($request);
+            case "do_migrate":
+                return $this->migrate($request);
             case "do_delete":
                 return $this->delete($request);
         }
     }
 
-    private function show(Request $request): Response
+    public function action(Request $request): string
     {
+        $action = $request->get("action");
+        if ($action && $action === $request->post("coco_do") && $request->getArray("coco_name") !== null) {
+            return "do_$action";
+        }
+        if ($action === "migrate" && $request->getArray("coco_name") !== null) {
+            return "migrate";
+        }
+        if ($action === "delete" && $request->getArray("coco_name") !== null) {
+            return "delete";
+        }
+        return "";
+    }
+
+    private function show(): Response
+    {
+        $cocos = $this->repository->findAllNames();
+        $oldCocos = array_diff($this->repository->findAllOldNames(), $cocos);
         return Response::create($this->view->render("admin", [
-            "action" => $request->sn(),
-            "cocos" => $this->repository->findAllNames(),
+            "old_cocos" => $oldCocos,
+            "cocos" => $cocos,
+        ]))->withTitle("Coco – " . $this->view->text("menu_main"));
+    }
+
+    /** @param list<array{key:string,arg:string}> $errors */
+    private function confirmMigrate(Request $request, array $errors = []): Response
+    {
+        return Response::create($this->view->render("confirm", [
+            "errors" => $errors,
+            "cocos" => $request->getArray("coco_name"),
+            "csrf_token" => $this->csrfProtector->token(),
+            "action" => "migrate",
         ]))->withTitle("Coco – " . $this->view->text("menu_main"));
     }
 
@@ -70,28 +103,54 @@ class CocoAdmin
     {
         return Response::create($this->view->render("confirm", [
             "errors" => $errors,
-            "cocos" => $request->cocoNames(),
+            "cocos" => $request->getArray("coco_name"),
             "csrf_token" => $this->csrfProtector->token(),
+            "action" => "delete",
         ]))->withTitle("Coco – " . $this->view->text("menu_main"));
+    }
+
+    private function migrate(Request $request): Response
+    {
+        if (!$this->csrfProtector->check($request->post("xh_csrf_token"))) {
+            return Response::create($this->view->message("fail", "error_unauthorized"));
+        }
+        $errors = [];
+        foreach (($request->getArray("coco_name") ?? []) as $name) {
+            try {
+                $this->repository->migrate($name);
+            } catch (RepositoryException $ex) {
+                $errors[] = ["key" => "error_migrate", "arg" => $this->repository->oldFilename($name)];
+            }
+        }
+        if ($errors) {
+            return $this->confirmMigrate($request, $errors);
+        }
+        return Response::redirect($request->url()->page("coco")->with("admin", "plugin_main")->absolute());
     }
 
     private function delete(Request $request): Response
     {
-        $this->csrfProtector->check();
+        if (!$this->csrfProtector->check($request->post("xh_csrf_token"))) {
+            return Response::create($this->view->message("fail", "error_unauthorized"));
+        }
         $errors = [];
-        foreach ($request->cocoNames() as $name) {
+        foreach (($request->getArray("coco_name") ?? []) as $name) {
             foreach ($this->repository->findAllBackups($name) as $backup) {
-                if (!$this->repository->delete(...$backup)) {
+                try {
+                    $this->repository->delete(...$backup);
+                } catch (RepositoryException $ex) {
                     $errors[] = ["key" => "error_delete", "arg" => $this->repository->filename(...$backup)];
                 }
             }
-            if (!$this->repository->delete($name)) {
+            try {
+                $this->repository->delete($name);
+            } catch (RepositoryException $ex) {
                 $errors[] = ["key" => "error_delete", "arg" => $this->repository->filename($name)];
             }
         }
         if ($errors) {
             return $this->confirmDelete($request, $errors);
         }
-        return Response::redirect(CMSIMPLE_URL . "?coco&admin=plugin_main");
+        return Response::redirect($request->url()->page("coco")->with("admin", "plugin_main")->absolute());
     }
 }

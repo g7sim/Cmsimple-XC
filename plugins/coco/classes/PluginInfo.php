@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2012-2023 Christoph M. Becker
+ * Copyright (c) Christoph M. Becker
  *
  * This file is part of Coco_XH.
  *
@@ -22,9 +22,9 @@
 namespace Coco;
 
 use Coco\Infra\Repository;
-use Coco\Infra\SystemChecker;
-use Coco\Infra\View;
-use Coco\Value\Response;
+use Plib\Response;
+use Plib\SystemChecker;
+use Plib\View;
 
 class PluginInfo
 {
@@ -61,61 +61,57 @@ class PluginInfo
     }
 
     /**
-     * @return array<array{state:string,key:string,arg:string,state_key:string}>
+     * @return list<object{class:string,message:string}>
      */
-    public function getChecks()
+    public function getChecks(): array
     {
-        return array(
-            $this->checkPhpVersion('7.0.0'),
-            $this->checkXhVersion('1.7.0'),
+        return [
+            $this->checkPhpVersion("7.1.0"),
+            $this->checkXhVersion("1.7.0"),
+            $this->checkPlibVersion("1.6"),
             $this->checkWritability($this->pluginFolder . "css/"),
             $this->checkWritability($this->pluginFolder . "languages/"),
             $this->checkWritability($this->repository->dataFolder())
-        );
-    }
-
-    /**
-     * @param string $version
-     * @return array{state:string,key:string,arg:string,state_key:string}
-     */
-    private function checkPhpVersion($version)
-    {
-        $state = $this->systemChecker->checkVersion(PHP_VERSION, $version) ? 'success' : 'fail';
-        return [
-            "state" => $state,
-            "key" => "syscheck_phpversion",
-            "arg" => $version,
-            "state_key" => "syscheck_$state",
         ];
     }
 
-    /**
-     * @param string $version
-     * @return array{state:string,key:string,arg:string,state_key:string}
-     */
-    private function checkXhVersion($version)
+    /** @return object{class:string,message:string} */
+    private function checkPhpVersion(string $version): object
     {
-        $state = $this->systemChecker->checkVersion(CMSIMPLE_XH_VERSION, "CMSimple_XH $version") ? 'success' : 'fail';
-        return [
-            "state" => $state,
-            "key" => "syscheck_xhversion",
-            "arg" => $version,
-            "state_key" => "syscheck_$state",
+        $state = $this->systemChecker->checkVersion(PHP_VERSION, $version);
+        return (object) [
+            "class" => $state ? "xh_success" : "xh_fail",
+            "message" => $this->view->plain($state ? "syscheck_phpversion" : "syscheck_phpversion_no", $version),
         ];
     }
 
-    /**
-     * @param string $folder
-     * @return array{state:string,key:string,arg:string,state_key:string}
-     */
-    private function checkWritability($folder)
+    /** @return object{class:string,message:string} */
+    private function checkXhVersion(string $version): object
     {
-        $state = $this->systemChecker->checkWritability($folder) ? 'success' : 'warning';
-        return [
-            "state" => $state,
-            "key" => "syscheck_writable",
-            "arg" => $folder,
-            "state_key" => "syscheck_$state",
+        $state = $this->systemChecker->checkVersion(CMSIMPLE_XH_VERSION, "CMSimple_XH $version");
+        return (object) [
+            "class" => $state ? "xh_success" : "xh_fail",
+            "message" => $this->view->plain($state ? "syscheck_xhversion" : "syscheck_xhversion_no", $version),
+        ];
+    }
+
+    /** @return object{class:string,message:string} */
+    private function checkPlibVersion(string $version): object
+    {
+        $state = $this->systemChecker->checkPlugin("plib", $version);
+        return (object) [
+            "class" => $state ? "xh_success" : "xh_fail",
+            "message" => $this->view->plain($state ? "syscheck_plibversion" : "syscheck_plibversion_no", $version),
+        ];
+    }
+
+    /** @return object{class:string,message:string} */
+    private function checkWritability(string $folder): object
+    {
+        $state = $this->systemChecker->checkWritability($folder);
+        return (object) [
+            "class" => $state ? "xh_success" : "xh_warning",
+            "message" => $this->view->plain($state ? "syscheck_writable" : "syscheck_writable_no", $folder),
         ];
     }
 }

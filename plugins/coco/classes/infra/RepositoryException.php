@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2023 Christoph M. Becker
+ * Copyright (c) Christoph M. Becker
  *
  * This file is part of Coco_XH.
  *
@@ -21,17 +21,8 @@
 
 namespace Coco\Infra;
 
-class SystemChecker
-{
-    /** @codeCoverageIgnore */
-    public function checkVersion(string $actual, string $minimum): bool
-    {
-        return version_compare($actual, $minimum) >= 0;
-    }
+use Exception;
 
-    /** @codeCoverageIgnore */
-    public function checkWritability(string $path): bool
-    {
-        return is_writable($path);
-    }
+class RepositoryException extends Exception
+{
 }

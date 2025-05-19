@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2012-2023 Christoph M. Becker
+ * Copyright (c) Christoph M. Becker
  *
  * This file is part of Coco_XH.
  *
@@ -25,9 +25,8 @@ if (!defined("CMSIMPLE_XH_VERSION")) {
 }
 
 use Coco\Dic;
-use Coco\Infra\Request;
-use Coco\Infra\Responder;
+use Plib\Request;
 
 /** @var string $o */
 
-$o .= Responder::respond(Dic::makeSearch()(Request::current()));
+$o .= Dic::makeSearch()(Request::current())();

@@ -1,24 +1,20 @@
 <?php
 
-use Coco\Infra\View;
+use Plib\View;
 
 if (!defined("CMSIMPLE_XH_VERSION")) {header("HTTP/1.0 403 Forbidden"); exit;}
 
 /**
  * @var View $this
- * @var string $logo
  * @var string $version
- * @var array<array{state:string,key:string,arg:string,state_key:string}> $checks
+ * @var list<object{class:string,message:string}> $checks
  */
 ?>
 <!-- coco info -->
-<h1>Coco <?=$version?></h1>
+<h1>Coco <?=$this->esc($version)?></h1>
 <div class="coco_syscheck">
-  <h2><?= $this->text('syscheck_title') ?></h2>
-  <?php foreach ($checks as $check): ?>
-    <p class="xh_<?= $check['state'] ?? '' ?>">
-      <?= $this->text((string)($check['key'] ?? ''), $check['arg'] ?? null) ?>
-      <?= $this->text((string)($check['state_key'] ?? '')) ?>
-    </p>
-  <?php endforeach; ?>
+  <h2><?=$this->text('syscheck_title')?></h2>
+<?foreach ($checks as $check):?>
+  <p class="<?=$this->esc($check->class)?>"><?=$this->esc($check->message)?></p>
+<?endforeach?>
 </div>

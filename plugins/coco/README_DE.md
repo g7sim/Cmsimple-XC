@@ -4,8 +4,8 @@ Coco_XH ermöglicht eine beliebige Anzahl so genannter Co-Contents
 auf Ihrer Website zu nutzen.
 Diese sind vergleichbar mit Newsboxen,
 aber haben unterschiedlichen Inhalt auf jeder Seite.
-Coco_XH wurde inspiriert vom
-[Also Plugin](http://cmsimplewiki-com.keil-portal.de/doku.php?id=plugins:also),
+Coco_XH wurde inspiriert vom alten
+Also Plugin,
 erlaubt aber das Bearbeiten mit dem gewählten Editor anstelle einer
 Textarea und der Verwendung von Skripting.
 
@@ -23,7 +23,11 @@ Textarea und der Verwendung von Skripting.
 ## Voraussetzungen
 
 Coco_XH ist ein Plugin für [CMSimple_XH](https://www.cmsimple-xh.org/de/).
-Es benötigt CMSimple_XH ≥ 1.7.0 und PHP ≥ 7.0.0.
+Es benötigt CMSimple_XH ≥ 1.7.0 und PHP ≥ 7.1.0.
+Coco_XH benötigt weiterhin [Plib_XH](https://github.com/cmb69/plib_xh) ≥ 1.6;
+ist dieses noch nicht installiert (siehe `Einstellungen` → `Info`),
+laden Sie das [aktuelle Release](https://github.com/cmb69/plib_xh/releases/latest)
+herunter, und installieren Sie es.
 
 ## Download
 
@@ -64,7 +68,7 @@ und dessen Stylesheet durchgeführt werden.
 Um Co-Content auf Ihrer Hompage zu nutzen,
 fügen Sie einfach an der gewünschten Stelle in Ihr Template
 
-    <?php echo coco('mein_content');?>
+    <?=coco('mein_content');?>
 
 ein, z.B. anstelle einer Newsbox.
 Statt `mein_content` können Sie jeden Namen wählen,
@@ -82,12 +86,9 @@ Möchten Sie eine andere Toolbar verwenden als diejenige,
 die für den Haupt-Content-Editor konfiguriert wurde,
 geben Sie einfach den Namen der Toolbar als zweiten Parameter an, z.B.
 
-    <?php echo coco('kleiner_content', 'sidebar');?>
+    <?=coco('kleiner_content', 'sidebar');?>
 
 Als Toolbar sind üblicherweise "full", "medium", "minimal" und "sidebar" verfügbar.
-Wie die Toolbars des TinyMCE angepasst werden können, wird im
-[CMSimple_XH-Wiki](https://www.cmsimple-xh.org/wiki/doku.php/de:tinymce#customization)
-erklärt.
 
 Der folgende Screenshot zeigt die Co-Contents im Bearbeitungsmodus:
 
@@ -98,28 +99,26 @@ sind auf 100% der Größes ihres Containers voreingestellt.
 Die Höhe kann durch einen dritten Parameter für
 den `coco()` Aufruf geändert werden, z.B.
 
-    <?php echo coco('mein_content', 'sidebar', '500px');?>
+    <?=coco('mein_content', 'sidebar', '500px');?>
 
 Wenn Sie diesen Parameter übergeben,
 dann müssen Sie auch den Toolbar-Parameter übergeben.
 Wenn Sie bei der Standard-Toolbar bleiben möchten,
 schreiben Sie einfach:
 
-    <?php echo coco('mein_content', false, '500px');>
+    <?=coco('mein_content', false, '500px');>
 
 Möchten Sie die Breite ändern, können Sie das im Stylesheet tun.
 
 Die Co-Contents werden im Unterordner `coco/` des `content/` Ordners
 von CMSimple_XH in einer HTML-Datei mit dem Namen,
 der als erster Parameter angegeben wurde, gespeichert,
-z.B. `mein_content.htm`.
-Die Struktur ist ähnlich zu derjenigen der CMSimple_XH `content.htm`-Datei von Version 1.7 und höher,
-aber aus historischen Gründen werden die Seiten entsprechend Ihrer Menüebene durch
-`<h1>`, `<h2>` … `<h9>` getrennt, statt durch die entsprechenden HTML-Kommentare.
-Die Namen der Seitenüberschriften werden nur zur besseren Lesbarkeit eingefügt;
+z.B. `mein_content.2.1.htm`.
+Die Struktur ist ähnlich zu derjenigen der CMSimple_XH `content.htm`-Datei von Version 1.7 und höher.
+Die Namen und Ebenen der Seitenüberschriften werden nur zur besseren Lesbarkeit eingefügt;
 sie werden von Coco_XH ignoriert.
-Statt dessen wird die Verknüpfung zur Seite durch die id der Überschrift hergestellt.
-Sie dürfen diese ids auf keinen Fall ändern!
+Statt dessen wird die Verknüpfung zur Seite durch die ID der Überschrift hergestellt.
+Sie dürfen diese IDs auf keinen Fall ändern!
 Das Erstellen neuer Seiten durch Einfügen neuer Überschriften ist nicht möglich;
 diese werden einfach ignoriert.
 
@@ -166,15 +165,14 @@ bestimmten Zweck*. Details finden Sie in der GNU General Public License.
 Sie sollten ein Exemplar der GNU General Public License zusammen mit
 Coco_XH erhalten haben. Falls nicht, siehe <https://www.gnu.org/licenses/>.
 
-Copyright © 2012-2023 Christoph M. Becker
+Copyright © Christoph M. Becker
 
-Slovakische Übersetzung © 2012 Dr. Martin Sereday  
-Tschechische Übersetzung © 2012 Josef Němec  
+Slovakische Übersetzung © Dr. Martin Sereday<br>
+Tschechische Übersetzung © Josef Němec  
 
 ## Danksagung
 
-Coco_XH wurde vom
-[Also Plugin](http://cmsimplewiki-com.keil-portal.de/doku.php?id=plugins:also)
+Coco_XH wurde vom Also Plugin
 von Ricardo Serpell inspiriert.
 
 Das Plugin-Icon wurde von [Andy Gongea](https://gongea.com/) gestaltet. 

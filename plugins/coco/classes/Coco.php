@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2012-2023 Christoph M. Becker
+ * Copyright (c) Christoph M. Becker
  *
  * This file is part of Coco_XH.
  *
@@ -21,14 +21,15 @@
 
 namespace Coco;
 
-use Coco\Infra\CsrfProtector;
-use Coco\Infra\Html;
 use Coco\Infra\Repository;
-use Coco\Infra\Request;
+use Coco\Infra\RepositoryException;
 use Coco\Infra\XhStuff;
-use Coco\Infra\View;
+use Coco\Logic\Searcher;
 use Coco\Logic\Util;
-use Coco\Value\Response;
+use Plib\CsrfProtector;
+use Plib\Request;
+use Plib\Response;
+use Plib\View;
 
 class Coco
 {
@@ -64,23 +65,22 @@ class Coco
         if ($request->s() < 0) {
             return Response::create("");
         }
-        switch ($request->cocoAction($name)) {
-            default:
-                return $this->show($request, $name);
-            case "edit":
-                return $this->edit($request, $name, $config, $height);
-            case "do_edit":
-                return $this->update($request, $name, $config, $height);
+        if (!$request->admin() || !$request->edit()) {
+            return $this->show($request, $name);
         }
+        if ($request->post("coco_text_$name") === null) {
+            return $this->edit($request, $name, $config, $height);
+        }
+        return $this->update($request, $name, $config, $height);
     }
 
     private function show(Request $request, string $name): Response
     {
         $content = $this->repository->find($name, $request->s());
         $content = $this->xhStuff->evaluateScripting($content);
-        $search = $request->search();
+        $search = $request->get("search") ?? "";
         if ($search !== "") {
-            $words = Util::parseSearchTerm($search);
+            $words = Searcher::parseSearchTerm($search);
             $content = $this->xhStuff->highlightSearchWords($words, $content);
         }
         return Response::create($content);
@@ -94,15 +94,19 @@ class Coco
 
     private function update(Request $request, string $name, string $config, string $height): Response
     {
-        $this->csrfProtector->check();
-        $text = $request->cocoText($name);
-        if ($this->repository->save($name, $request->s(), $text)) {
-            return Response::redirect(CMSIMPLE_URL . "?" . $request->queryString());
+        if (!$this->csrfProtector->check($request->post("xh_csrf_token"))) {
+            return Response::create($this->view->message("fail", "error_unauthorized"));
         }
-        return Response::create(
-            $this->view->message("fail", "error_save", $this->repository->filename($name))
-            . $this->renderEditor($name, $config, $height, $text)
-        );
+        $text = $request->post("coco_text_$name") ?? "";
+        try {
+            $this->repository->save($name, $request->s(), $text);
+        } catch (RepositoryException $ex) {
+            return Response::create(
+                $this->view->message("fail", "error_save", $this->repository->filename($name))
+                . $this->renderEditor($name, $config, $height, $text)
+            );
+        }
+        return Response::redirect($request->url()->absolute());
     }
 
     private function renderEditor(string $name, string $config, string $height, string $content): string
@@ -114,7 +118,7 @@ class Coco
             "name" => $name,
             "style" => "width:100%; height:$height",
             "content" => $content,
-            "editor" => $editor !== false ? new Html($editor) : false,
+            "editor" => $editor !== false ? $editor : false,
             "csrf_token" => $this->csrfProtector->token(),
         ]);
     }

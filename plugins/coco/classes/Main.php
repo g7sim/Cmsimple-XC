@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2012-2023 Christoph M. Becker
+ * Copyright (c) Christoph M. Becker
  *
  * This file is part of Coco_XH.
  *
@@ -22,10 +22,11 @@
 namespace Coco;
 
 use Coco\Infra\Repository;
-use Coco\Infra\Request;
-use Coco\Infra\View;
+use Coco\Infra\RepositoryException;
 use Coco\Logic\Util;
-use Coco\Value\Response;
+use Plib\Request;
+use Plib\Response;
+use Plib\View;
 
 class Main
 {
@@ -48,28 +49,28 @@ class Main
 
     public function __invoke(Request $request): Response
     {
-        if (!$request->logOut()) {
-            return Response::create("");
-        }
         $o = "";
         foreach ($this->repository->findAllNames() as $coco) {
-            $o .= $this->backup($coco, Util::backupPrefix($request->requestTime()));
+            $o .= $this->backup($coco, Util::backupPrefix($request->time()));
         }
         return Response::create($o);
     }
 
     private function backup(string $coconame, string $backupDate): string
     {
-        if (!$this->repository->backup($coconame, $backupDate)) {
+        try {
+            $this->repository->backup($coconame, $backupDate);
+        } catch (RepositoryException $ex) {
             return $this->view->message("fail", "error_save", $this->repository->filename($coconame, $backupDate));
         }
         $o = $this->view->message("info", "info_created", $this->repository->filename($coconame, $backupDate));
         $backups = $this->repository->findAllBackups($coconame);
         $backups = array_slice($backups, 0, count($backups) - (int) $this->conf['backup_numberoffiles']);
         foreach ($backups as $backup) {
-            if ($this->repository->delete(...$backup)) {
+            try {
+                $this->repository->delete(...$backup);
                 $o .= $this->view->message("info", "info_deleted", $this->repository->filename(...$backup));
-            } else {
+            } catch (RepositoryException $ex) {
                 $o .= $this->view->message("fail", "error_delete", $this->repository->filename(...$backup));
             }
         }

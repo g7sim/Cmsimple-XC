@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2012-2023 Christoph M. Becker
+ * Copyright (c) Christoph M. Becker
  *
  * This file is part of Coco_XH.
  *
@@ -25,8 +25,7 @@ if (!defined("CMSIMPLE_XH_VERSION")) {
 }
 
 use Coco\Dic;
-use Coco\Infra\Request;
-use Coco\Infra\Responder;
+use Plib\Request;
 
 /**
  * @var string $admin
@@ -39,10 +38,10 @@ if (XH_wantsPluginAdministration("coco")) {
     $o .= print_plugin_admin("on");
     switch ($admin) {
         case "":
-            $o .= Responder::respond(Dic::makePluginInfo()());
+            $o .= Dic::makePluginInfo()()();
             break;
         case "plugin_main":
-            $o .= Responder::respond(Dic::makeCocoAdmin()(Request::current()));
+            $o .= Dic::makeCocoAdmin()(Request::current())();
             break;
         default:
             $o .= plugin_admin_common();

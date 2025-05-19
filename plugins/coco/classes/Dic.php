@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2012-2023 Christoph M. Becker
+ * Copyright (c) Christoph M. Becker
  *
  * This file is part of Coco_XH.
  *
@@ -21,13 +21,13 @@
 
 namespace Coco;
 
-use Coco\Infra\CsrfProtector;
-use Coco\Infra\IdGenerator;
 use Coco\Infra\Pages;
 use Coco\Infra\Repository;
-use Coco\Infra\SystemChecker;
-use Coco\Infra\View;
 use Coco\Infra\XhStuff;
+use Plib\CsrfProtector;
+use Plib\Random;
+use Plib\SystemChecker;
+use Plib\View;
 
 class Dic
 {
@@ -44,8 +44,8 @@ class Dic
     {
         return new Coco(
             self::makeRepository(),
-            new CsrfProtector,
-            new XhStuff,
+            new CsrfProtector(),
+            new XhStuff(),
             self::makeView()
         );
     }
@@ -54,8 +54,8 @@ class Dic
     {
         return new Search(
             self::makeRepository(),
-            new Pages,
-            new XhStuff,
+            new Pages(),
+            new XhStuff(),
             self::makeView()
         );
     }
@@ -64,7 +64,7 @@ class Dic
     {
         return new CocoAdmin(
             self::makeRepository(),
-            new CsrfProtector,
+            new CsrfProtector(),
             self::makeView()
         );
     }
@@ -75,7 +75,7 @@ class Dic
         return new PluginInfo(
             $pth["folder"]["plugins"] . "coco/",
             self::makeRepository(),
-            new SystemChecker,
+            new SystemChecker(),
             self::makeView()
         );
     }
@@ -87,8 +87,8 @@ class Dic
         return new Repository(
             $pth['folder']['content'] . "coco/",
             $pth['file']['content'],
-            new Pages,
-            new IdGenerator()
+            new Pages(),
+            new Random()
         );
     }
 

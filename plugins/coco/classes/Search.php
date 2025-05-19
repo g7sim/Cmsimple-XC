@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2012-2023 Christoph M. Becker
+ * Copyright (c) Christoph M. Becker
  *
  * This file is part of Coco_XH.
  *
@@ -23,11 +23,12 @@ namespace Coco;
 
 use Coco\Infra\Pages;
 use Coco\Infra\Repository;
-use Coco\Infra\Request;
-use Coco\Infra\View;
 use Coco\Infra\XhStuff;
-use Coco\Logic\Util;
-use Coco\Value\Response;
+use Coco\Logic\Searcher;
+use Plib\Request;
+use Plib\Response;
+use Plib\Url;
+use Plib\View;
 
 class Search
 {
@@ -53,66 +54,49 @@ class Search
 
     public function __invoke(Request $request): Response
     {
-        $words = Util::parseSearchTerm($request->search());
-        $indexes = $this->searchContent(null, $words);
-        foreach ($this->repository->findAllNames() as $name) {
-            $indexes = array_merge($indexes, $this->searchContent($name, $words));
-        }
-        $indexes = array_unique($indexes);
-        sort($indexes);
-        return Response::create($this->renderSearchResults($indexes, $request->sn(), $words))
+        $words = Searcher::parseSearchTerm($request->get("search") ?? "");
+        $indexes = Searcher::search($words, $this->contents());
+        return Response::create($this->renderSearchResults($indexes, $request->url(), implode(" ", $words)))
             ->withTitle($this->view->text("search_title"));
     }
 
-    /**
-     * @param list<string> $words
-     * @return list<int>
-     */
-    private function searchContent(?string $name, array $words): array
+    /** @return iterable<int,string> */
+    private function contents(): iterable
     {
-        $contents = $name === null ? $this->pages->contents() : $this->repository->findAll($name);
-        $indexes = [];
-        foreach ($contents as $index => $content) {
-            if (!$this->pages->isHidden($index) && $this->findAllIn($words, $content)) {
-                $indexes[] = $index;
+        foreach ($this->pages->contents() as $index => $content) {
+            if (!$this->pages->isHidden($index)) {
+                yield $index => $this->xhStuff->evaluateScripting($content);
             }
         }
-        return $indexes;
+        foreach ($this->repository->findAllNames() as $name) {
+            foreach ($this->repository->findAll($name) as $index => $content) {
+                if (!$this->pages->isHidden($index)) {
+                    yield $index => $this->xhStuff->evaluateScripting($content);
+                }
+            }
+        }
     }
 
-    /** @param list<string> $words */
-    private function findAllIn(array $words, string $text): bool
-    {
-        $text = strip_tags($this->xhStuff->evaluateScripting($text));
-        $text = html_entity_decode($text, ENT_QUOTES, "UTF-8");
-        return Util::textContainsAllWords($text, $words);
-    }
-
-    /**
-     * @param list<int> $pageIndexes
-     * @param list<string> $searchWords
-     */
-    private function renderSearchResults(array $pageIndexes, string $sn, array $searchWords): string
+    /** @param list<int> $pageIndexes */
+    private function renderSearchResults(array $pageIndexes, Url $url, string $searchTerm): string
     {
         return $this->view->render("search_results", [
-            "search_term" => implode(" ", $searchWords),
-            "pages" => $this->pageRecords($pageIndexes, $sn, implode(",", $searchWords)),
+            "search_term" => $searchTerm,
+            "pages" => $this->pageRecords($pageIndexes, $url, $searchTerm),
         ]);
     }
 
     /**
      * @param list<int> $pageIndexes
-     * @return list<array{heading:string,url:string}>
+     * @return list<object{heading:string,url:string}>
      */
-    private function pageRecords(array $pageIndexes, string $sn, string $searchWords): array
+    private function pageRecords(array $pageIndexes, Url $url, string $searchTerm): array
     {
-        $records = [];
-        foreach ($pageIndexes as $pageIndex) {
-            $records[] = [
+        return array_map(function (int $pageIndex) use ($url, $searchTerm) {
+            return (object) [
                 "heading" => $this->pages->heading($pageIndex),
-                "url" => $sn . "?" . $this->pages->url($pageIndex) . "&search=" . urlencode($searchWords),
+                "url" => $url->page($this->pages->url($pageIndex))->with("search", $searchTerm)->relative(),
             ];
-        }
-        return $records;
+        }, $pageIndexes);
     }
 }
