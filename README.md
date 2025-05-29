@@ -30,7 +30,7 @@
 
 * Many other temples from Cmsimple XH may also function with this version (evtl. with small patches)
 
-* For a simple usermanagement is the <ahref="https://github.com/gtbu/register_xh-25/tags" target=_blank> Register</plugin>
+* For a simple usermanagement is the <ahref="https://github.com/g7sim/register_xh-25" target=_blank> Register</plugin>
 
 * If You find bugs, please open an issue above. You may also make a fork and a push with Your solutions and proposals.
 
