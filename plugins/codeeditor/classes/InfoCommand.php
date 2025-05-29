@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2011-2021 Christoph M. Becker
+ * Copyright (c) Christoph M. Becker
  *
  * This file is part of Codeeditor_XH.
  *
@@ -21,33 +21,72 @@
 
 namespace Codeeditor;
 
+use Plib\Response;
+use Plib\SystemChecker;
+use Plib\View;
+
 class InfoCommand
 {
-    /**
-     * @return void
-     */
-    public function __invoke()
+    /** @var string */
+    private $pluginFolder;
+
+    /** @var SystemChecker */
+    private $systemChecker;
+
+    /** @var View */
+    private $view;
+
+    public function __construct(string $pluginFolder, SystemChecker $systemChecker, View $view)
     {
-        echo '<h1>Codeeditor ' . Plugin::VERSION . '</h1>',
-            $this->systemCheck();
+        $this->pluginFolder = $pluginFolder;
+        $this->systemChecker = $systemChecker;
+        $this->view = $view;
     }
 
-    private function systemCheck(): string
+    public function __invoke(): Response
     {
-        global $pth, $plugin_tx;
+        return Response::create($this->view->render("info", [
+            "version" => CODEEDITOR_VERSION,
+            "checks" => $this->systemChecks(),
+        ]))->withTitle($this->view->esc("Codeeditor " . CODEEDITOR_VERSION));
+    }
 
-        $phpVersion = '7.0.0';
-        $ptx = $plugin_tx['codeeditor'];
-        $o = '<h2>' . $ptx['syscheck_title'] . '</h2>';
-        $result = version_compare(PHP_VERSION, $phpVersion) >= 0 ? 'success' : 'fail';
-        $o .= XH_message($result, $ptx['syscheck_phpversion'], $phpVersion);
-        foreach (array('config/', 'css/', 'languages/') as $folder) {
-            $folders[] = $pth['folder']['plugins'].'codeeditor/' . $folder;
+    /** @return list<object{class:string,message:string}> */
+    private function systemChecks(): array
+    {
+        $checks = [];
+        $phpVersion = "7.1.0";
+        $checks[] = (object) [
+            "class" => $this->systemChecker->checkVersion(PHP_VERSION, $phpVersion)
+                ? "xh_success"
+                : "xh_fail",
+            "message" => $this->view->plain("syscheck_phpversion", $phpVersion),
+        ];
+        $xhVersion = "1.7.0";
+        $checks[] = (object) [
+            "class" => $this->systemChecker->checkVersion(CMSIMPLE_XH_VERSION, "CMSimple_XH $xhVersion")
+                ? "xh_success"
+                : "xh_fail",
+            "message" => $this->view->plain("syscheck_xhversion", $xhVersion),
+        ];
+        $plibVersion = "1.3";
+        $checks[] = (object) [
+            "class" => $this->systemChecker->checkPlugin("plib", $plibVersion)
+                ? "xh_success"
+                : "xh_fail",
+            "message" => $this->view->plain("syscheck_plibversion", $plibVersion),
+        ];
+        foreach (array("config/", "css/", "languages/") as $folder) {
+            $folders[] = $this->pluginFolder . $folder;
         }
         foreach ($folders as $folder) {
-            $result = is_writable($folder) ? 'success' : 'warn';
-            $o .= XH_message($result, $ptx['syscheck_writable'], $folder);
+            $checks[] = (object) [
+                "class" =>  $this->systemChecker->checkWritability($folder)
+                    ? "xh_success"
+                    : "xh_warning",
+                "message" => $this->view->plain("syscheck_writable", $folder),
+            ];
         }
-        return $o;
+        return $checks;
     }
 }

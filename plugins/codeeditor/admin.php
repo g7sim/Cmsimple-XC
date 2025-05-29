@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2011-2021 Christoph M. Becker
+ * Copyright (c) Christoph M. Becker
  *
  * This file is part of Codeeditor_XH.
  *
@@ -19,5 +19,38 @@
  * along with Codeeditor_XH.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use Codeeditor\Dic;
+use Plib\Request;
 
-Codeeditor\Plugin::dispatch();
+if (!defined("CMSIMPLE_XH_VERSION")) {
+    http_response_code(403);
+    exit;
+}
+
+/** @return list<string> */
+function codeeditor_getThemes(): array
+{
+    return Dic::editor()->getThemes();
+}
+
+/**
+ * @var string $admin
+ * @var string $o
+ * @var array<string,array<string,string>> $plugin_cf
+ */
+
+XH_registerStandardPluginMenuItems(false);
+XH_registerPluginType("editor", "codeeditor");
+if ($plugin_cf["codeeditor"]["enabled"]) {
+    Dic::mainCommand()(Request::current())();
+}
+if (XH_wantsPluginAdministration("codeeditor")) {
+    $o .= print_plugin_admin("off");
+    switch ($admin) {
+        case "":
+            $o .= Dic::infoCommand()()();
+            break;
+        default:
+            $o .= plugin_admin_common();
+    }
+}

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2011-2021 Christoph M. Becker
+ * Copyright (c) Christoph M. Becker
  *
  * This file is part of Codeeditor_XH.
  *
@@ -19,24 +19,21 @@
  * along with Codeeditor_XH.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * @return array<int,string>
- */
-function Codeeditor_getThemes(): array
-{
-    return Codeeditor\Plugin::getThemes();
-}
+use Codeeditor\Dic;
+use Plib\Request;
+
+const CODEEDITOR_VERSION = "2.3";
+
+// the 4 editor functions are public API; don't (re)move
 
 /**
  * Writes the basic JavaScript of the editor to the `head' element.
  * No editors are actually created. Multiple calls are allowed.
  * This is called from init_EDITOR() automatically, but not from EDITOR_replace().
- *
- * @return void
  */
-function include_codeeditor()
+function include_codeeditor(): void
 {
-    Codeeditor\Plugin::doInclude();
+    Dic::editor()->doInclude(Request::current())();
 }
 
 /**
@@ -50,19 +47,19 @@ function include_codeeditor()
  */
 function codeeditor_replace(string $elementId, string $config = ''): string
 {
-    return Codeeditor\Plugin::replace($elementId, $config);
+    return Dic::editor()->replace($elementId, $config);
 }
 
 /**
  * Instantiates the editor(s) on the textarea(s) given by $classes.
  * $config is exactly the same as for EDITOR_replace().
  *
- * @param array<int,string> $classes
+ * @param list<string> $classes
  * @param string|false $config
  */
 function init_codeeditor(array $classes = [], $config = false): bool
 {
-    Codeeditor\Plugin::init($classes, $config);
+    Dic::editor()->init(Request::current(), $classes, $config)();
     return true;
 }
 
@@ -70,11 +67,11 @@ function init_codeeditor(array $classes = [], $config = false): bool
  * Instantiates the editor(s) in CSS mode on the textarea(s) given by $classes.
  * $config is exactly the same as for EDITOR_replace().
  *
- * @param array<int,string> $classes
+ * @param list<string> $classes
  * @param string|false $config
  */
 function init_codeeditor_css(array $classes = [], $config = false): bool
 {
-    Codeeditor\Plugin::init($classes, $config, 'css');
+    Dic::editor()->init(Request::current(), $classes, $config, 'css')();
     return true;
 }
