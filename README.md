@@ -1,6 +1,6 @@
 # Cmsimple-XC  - php 8.4 - ready
 
-* This git contains a modified Fork of Cmsimple XH 1.7.2 with clean urls and a http - security filter and nonce.
+* This git contains a modified and progressed fork of Cmsimple XH 1.7.2 with clean urls and a http - security filter and nonce.
 
 * It has the same GPL3 license (Licenses of plugins are to be observed), und there is also a Wikipedia article about the <a href=https://en.wikipedia.org/wiki/CMSimple> history of Cmsimple</a>
 
