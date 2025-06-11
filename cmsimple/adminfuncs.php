@@ -620,7 +620,7 @@ function XH_registerPluginMenuItem($plugin, $label = null, $url = null, $target 
  */
 function XH_adminMenu(array $plugins = array())
 {
-    global $sn, $edit, $s, $u, $cf, $tx, $su, $plugin_tx;
+    global $sn, $edit, $s, $u, $cf, $tx, $su, $plugin_tx, $changeMode;
 
     if ($s < 0) {
         $su = $u[0];
@@ -927,7 +927,7 @@ function XH_contentEditor()
 function XH_saveContents()
 {
     global $c, $pth, $tx, $edit, $pd_router;
-
+    if (!$changeMode == 'normal') { $edit = true; }
     if (!(XH_ADM && $edit)) {
         trigger_error(
             'Function ' . __FUNCTION__ . '() must not be called in view mode',

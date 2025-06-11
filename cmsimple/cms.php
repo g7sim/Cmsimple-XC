@@ -605,9 +605,6 @@ $userfiles = null;
  * @see $normal
  */
 $edit = null;
-if (isset($_GET['edit']) && XH_ADM) {
-    $edit = true;
-}
 
 /**
  * Whether normal mode is requested.
