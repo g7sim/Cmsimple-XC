@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2017 Christoph M. Becker
+ * Copyright 2017-2021 Christoph M. Becker
  *
  * This file is part of Fa_XH.
  *
@@ -28,27 +28,53 @@ class RequireCommand
      */
     private static $isEmitted = false;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $pluginFolder;
 
-    public function __construct()
-    {
-        global $pth;
+    /** @var array<string,string> */
+    private $conf;
 
-        $this->pluginFolder = "{$pth['folder']['plugins']}fa/";
+    /** @param array<string,string> $conf */
+    public function __construct(string $pluginFolder, array $conf)
+    {
+        $this->pluginFolder = $pluginFolder;
+        $this->conf = $conf;
     }
 
+    /**
+     * @return void
+     */
     public function execute()
     {
         global $hjs;
-    
+
         if (self::$isEmitted) {
             return;
         }
         self::$isEmitted = true;
-        $hjs .= '<link rel="stylesheet" type="text/css" href="' . $this->pluginFolder
-            . 'css/font-awesome.min.css">';
+
+        switch ($this->conf['fontawesome_version']) {
+            case "5":
+                $fa_css_pth = 'css/v5/all.min.css';
+                break;
+            case "6":
+                $fa_css_pth = 'css/v6/all.min.css';
+                break;
+            default:
+                $fa_css_pth = 'css/font-awesome.min.css';
+        }
+        $hjs .= '<link rel="stylesheet" type="text/css" href="' . $this->pluginFolder . $fa_css_pth . '">';
+        if ($this->conf['fontawesome_shim']) {
+            switch ($this->conf['fontawesome_version']) {
+                case "5":
+                    $hjs .= '<link rel="stylesheet" type="text/css" href="' . $this->pluginFolder
+                        . 'css/v5/v4-shims.min.css">';
+                    break;
+                case "6":
+                    $hjs .= '<link rel="stylesheet" type="text/css" href="' . $this->pluginFolder
+                        . 'css/v6/v4-shims.min.css">';
+                    break;
+            }
+        }
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2017 Christoph M. Becker
+ * Copyright 2017-2021 Christoph M. Becker
  *
  * This file is part of Fa_XH.
  *
@@ -23,122 +23,43 @@ namespace Fa;
 
 class View
 {
-    /**
-     * @var string
-     */
-    private $template;
+    /** @var string */
+    private $templateFolder;
 
-    /**
-     * @var array
-     */
-    private $data = array();
+    /** @var array<string,string> */
+    private $text;
 
-    /**
-     * @param string $template
-     */
-    public function __construct($template)
+    /** @param array<string,string> $text */
+    public function __construct(string $templateFolder, array $text)
     {
-        $this->template = $template;
+        $this->templateFolder = $templateFolder;
+        $this->text = $text;
     }
 
-    /**
-     * @param string $name
-     * @param mixed $value
-     */
-    public function __set($name, $value)
+    /** @param scalar $args */
+    public function text(string $key, ...$args): string
     {
-        $this->data[$name] = $value;
+        return $this->esc(vsprintf($this->text[$key], $args));
     }
 
-    /**
-     * @param string $name
-     * @return string
-     */
-    public function __get($name)
+    /** @param scalar $args */
+    public function plain(string $key, ...$args): string
     {
-        return $this->data[$name];
+        return vsprintf($this->text[$key], $args);
     }
 
-    /**
-     * @param string $name
-     * @return bool
-     */
-    public function __isset($name)
+    /** @param array<string,mixed> $_data */
+    public function render(string $template, array $_data): string
     {
-        return isset($this->data[$name]);
-    }
-
-    /**
-     * @param string $name
-     * @return string
-     */
-    public function __call($name, array $args)
-    {
-        return $this->escape($this->data[$name]);
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
+        extract($_data);
         ob_start();
-        $this->render();
-        return ob_get_clean();
-    }
-    
-    /**
-     * @param string $key
-     * @return string
-     */
-    protected function text($key)
-    {
-        global $plugin_tx;
-
-        $args = func_get_args();
-        array_shift($args);
-        return $this->escape(vsprintf($plugin_tx['fa'][$key], $args));
+        include "{$this->templateFolder}{$template}.php";
+        return (string) ob_get_clean();
     }
 
-    /**
-     * @param string $key
-     * @param int $count
-     */
-    protected function plural($key, $count)
+    /** @param scalar $value */
+    public function esc($value): string
     {
-        global $plugin_tx;
-
-        if ($count == 0) {
-            $key .= '_0';
-        } else {
-            $key .= XH_numberSuffix($count);
-        }
-        $args = func_get_args();
-        array_shift($args);
-        return $this->escape(vsprintf($plugin_tx['fa'][$key], $args));
-    }
-
-    /**
-     * @return string
-     */
-    public function render()
-    {
-        global $pth;
-
-        echo "<!-- {$this->template} -->", PHP_EOL;
-        include "{$pth['folder']['plugins']}fa/views/{$this->template}.php";
-    }
-
-    /**
-     * @param mixed $value
-     * @return mixed
-     */
-    protected function escape($value)
-    {
-        if ($value instanceof HtmlString) {
-            return $value;
-        } else {
-            return XH_hsc($value);
-        }
+        return XH_hsc((string) $value);
     }
 }

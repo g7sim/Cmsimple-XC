@@ -26,7 +26,7 @@
 
 * With <a href=https://github.com/g7sim/hi_admin_xh> Hi Admin</a> you can edit more(to install make entry under Konfiguration), and most of the 1.7x - plugins function.
 
-* The full version contains FHS-templates and  several <a href=https://github.com/g7sim/Bootstrap3-XH target=_blank> Bootstrap 3</a>- and <a href=https://github.com/g7sim/Bootstrap4-XH target=_blank> Bootstrap 4 -</a>  and <a href=https://github.com/g7sim/Smartmenus-XH> Smartmenus -</a> templates as You also can find them in this git.
+* The full version contains FHS-templates and several <a href=https://github.com/g7sim/Bootstrap3-XH target=_blank> Bootstrap 3</a>- and <a href=https://github.com/g7sim/Bootstrap4-XH target=_blank> Bootstrap 4 -</a>  and <a href=https://github.com/g7sim/Bootstrap5-XH target=_blank> Bootstrap 5</a>- and <a href=https://github.com/g7sim/Smartmenus-XH> Smartmenus -</a> templates as You also can find them in this git.
 
 * Many other temples from Cmsimple XH may also function with this version (evtl. with small patches)
 

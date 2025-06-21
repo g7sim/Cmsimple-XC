@@ -1,19 +1,29 @@
-$("ul.menulevel1").addClass("nav navbar-nav mr-auto");
+document.addEventListener("DOMContentLoaded", function() {
+    
+    document.querySelectorAll('ul.menulevel1').forEach(el => {
+        el.classList.add('nav', 'navbar-nav', 'mr-auto');
+    });
 
-$("ul.menulevel1 > li:first-child").addClass("nav-item"); 
+    document.querySelectorAll('ul.menulevel1 > li:first-child').forEach(el => {
+        el.classList.add('nav-item');
+    });
 
-$("ul.menulevel1 li a").addClass("nav-link"); //a+ dropdown-item  
-$("li.docs").addClass("nav-item dropdown");  // docs Seite mit vorhandenen Unterseiten
-$("li.sdocs").addClass("nav-item dropdown");  // sdocs - eine aktive Seite mit vorhandenen Unterseiten
+    document.querySelectorAll('ul.menulevel1 li a').forEach(el => {
+        el.classList.add('nav-link');
+    });
 
-$("ul.menulevel2").addClass("dropdown-menu"); 
-$("ul.menulevel3").addClass("dropdown-menu"); 
-$("ul.menulevel4").addClass("dropdown-menu"); 
-$("ul.menulevel5").addClass("dropdown-menu"); 
-$("ul.menulevel6").addClass("dropdown-menu"); 
-$("ul.menulevel7").addClass("dropdown-menu"); 
-$("ul.menulevel8").addClass("dropdown-menu"); 
-$("ul.menulevel9").addClass("dropdown-menu"); 
+    document.querySelectorAll('li.docs, li.sdocs').forEach(el => {
+        el.classList.add('nav-item', 'dropdown');
+    });
+
+    document.querySelectorAll(
+        'ul.menulevel2, ul.menulevel3, ul.menulevel4, ' +
+        'ul.menulevel5, ul.menulevel6, ul.menulevel7, ' +
+        'ul.menulevel8, ul.menulevel9'
+    ).forEach(el => {
+        el.classList.add('dropdown-menu');
+    });
+});
 
  
 $('.nav li > span').each(function() {
