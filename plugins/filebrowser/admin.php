@@ -61,7 +61,7 @@ if (!$cf['filebrowser']['external']
         $f = 'media';
     }
 
-    $temp = new Fa\RequireCommand;
+    $temp = new Fa\RequireCommand('filebrowser', []);
     $temp->execute();
 
     $bjs .= '<script type="text/javascript" src="' . $pth['folder']['plugins']
