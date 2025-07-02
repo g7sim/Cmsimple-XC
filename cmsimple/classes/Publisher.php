@@ -73,7 +73,7 @@ class Publisher
             $this->published = array_fill(0, $cl, true);
         } else {
             foreach ($pd_router->find_all() as $index => $data) {
-                $this->hidden[$index] = $data['linked_to_menu'] == '0'
+                $this->hidden[$index] = ($data['linked_to_menu'] ?? '') == '0'
                     || !$removed[$index] && hide($index);
                 $this->published[$index] = !$removed[$index]
                     && $this->isPublishedInPageData($data);
@@ -154,7 +154,7 @@ class Publisher
      */
     private function isPublishedInPageData(array $data)
     {
-        if ($data['published'] == '0') {
+        if (($data['published'] ?? '') == '0') {
             return false;
         }
         $publication_date = isset($data['publication_date'])
