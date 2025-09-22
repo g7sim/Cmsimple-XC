@@ -1,5 +1,6 @@
 /**
- * Copyright 2011-2021 Christoph M. Becker
+ * Copyright 2011-2023 Christoph M. Becker
+ * Copyright 2024 The CMSimple_XH developers
  *
  * This file is part of Pagemanager_XH.
  *
@@ -16,6 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Pagemanager_XH.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+var pmPATH = window.location.pathname.replace((/\/index.php$|\/[a-z]{2}\/index.php$|\/[a-z]{2}\/$/), '/');
+var pmURL = window.location.protocol + "//" + window.location.host + pmPATH;
 
 (function ($) {
     "use strict";
@@ -242,21 +246,21 @@
             action: (function (obj) {
                 commands[op + "Before"](obj.reference);
             }),
-            icon: "fa fa-arrow-up",
+            icon: pmURL + "plugins/pagemanager/images/arrow_upward.svg",
             _disabled: op === "paste" && getPasteLevel(node) > 9
         }, {
             label: PAGEMANAGER.inside,
             action: (function (obj) {
                 commands[op + "Inside"](obj.reference);
             }),
-            icon: "fa fa-arrow-right",
+            icon: pmURL + "plugins/pagemanager/images/arrow_forward.svg",
             _disabled: op === "add" ? getLevel(node) >= 9 : getPasteLevel(node) >= 9 || isNodeInBuffer(node)
         }, {
             label: PAGEMANAGER.after,
             action: (function (obj) {
                 commands[op + "After"](obj.reference);
             }),
-            icon: "fa fa-arrow-down",
+            icon: pmURL + "plugins/pagemanager/images/arrow_downward.svg",
             _disabled: op === "paste" && getPasteLevel(node) > 9
         }];
     }
@@ -282,7 +286,7 @@
             value.action = (function (obj) {
                 commands[name](obj.reference);
             });
-            value.icon = "fa " + PAGEMANAGER.classes[name];
+            value.icon = pmURL + "plugins/pagemanager/images/" + PAGEMANAGER.classes[name] + ".svg";
         });
         delete tools.add.action;
         delete tools.paste.action;
@@ -384,27 +388,27 @@
             }),
             types: ({
                 "new": {
-                    icon: "fa fa-folder-open",
+                    icon: pmURL + "plugins/pagemanager/images/folder_open.svg",
                     max_depth: 8
                 },
                 unrenameable: ({
-                    icon: "fa fa-tag",
+                    icon: pmURL + "plugins/pagemanager/images/sell.svg",
                     max_depth: 8
                 }),
                 "duplicate-default": {
-                    "icon": "fa fa-exclamation-triangle",
+                    icon: pmURL + "plugins/pagemanager/images/warning.svg",
                     max_depth: 8
                 },
                 "duplicate-new": {
-                    "icon": "fa fa-exclamation-triangle",
+                    icon: pmURL + "plugins/pagemanager/images/warning.svg",
                     max_depth: 8
                 },
                 "duplicate-unrenameable": {
-                    "icon": "fa fa-exclamation-triangle",
+                    icon: pmURL + "plugins/pagemanager/images/warning.svg",
                     max_depth: 8
                 },
-                "default": {                    
-                    icon: "fa fa-folder-open-o",
+                "default": {
+                    icon: pmURL + "plugins/pagemanager/images/folder_open.svg",
                     max_depth: 8
                 }
             })
@@ -522,10 +526,13 @@
             return undefined;
         });
 
+        var svgArrowUp = '<img src="' + pmURL + 'plugins/pagemanager/images/arrow_upward.svg" alt="" aria-hidden="true">';
+        var svgArrowRight = '<img src="' + pmURL + 'plugins/pagemanager/images/arrow_forward.svg" alt="" aria-hidden="true">';
+        var svgArrowDown = '<img src="' + pmURL + 'plugins/pagemanager/images/arrow_downward.svg" alt="" aria-hidden="true">';
         var template = '<div class="pagemanager_tool_inner">' +
-            '<button id="pagemanager_%sBefore" type="button" title="' + PAGEMANAGER.before + '"><span class="fa fa-arrow-up fa-lg" aria-hidden="true"></span></button>' +
-            '<button id="pagemanager_%sInside" type="button" title="' + PAGEMANAGER.inside + '"><span class="fa fa-arrow-right fa-lg" aria-hidden="true"></span></button>' +
-            '<button id="pagemanager_%sAfter" type="button" title="' + PAGEMANAGER.after + '"><span class="fa fa-arrow-down fa-lg" aria-hidden="true"></span></button>' +
+            '<button id="pagemanager_%sBefore" type="button" title="' + PAGEMANAGER.before + '">' + svgArrowUp + '</button>' +
+            '<button id="pagemanager_%sInside" type="button" title="' + PAGEMANAGER.inside + '">' + svgArrowRight + '</button>' +
+            '<button id="pagemanager_%sAfter" type="button" title="' + PAGEMANAGER.after + '">' + svgArrowDown + '</button>' +
             '</div>';
         $("#pagemanager_add, #pagemanager_paste")
             .wrap('<div class="pagemanager_tool_wrapper">');
