@@ -170,6 +170,11 @@ if (defined('XH_ADM') && XH_ADM && isset($_GET['backup'])) {
 }
 
 
+/* ------- polyfills ----------- */
+require_once('assets/polyfills/bootstrap.php');
+
+
+
 /* -------------------- uriclean and security filter -----------------------*/
 
 function redir301($goto, $protocol = "http://")
@@ -237,3 +242,4 @@ use CssCrush\Crush;
 /*----------------------Jshrink init----------------------------------------*/
 require_once ('assets/js/Minifier.php');
 use JShrink\Minifier;
+

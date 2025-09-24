@@ -215,10 +215,10 @@ function toc($start = null, $end = null, $li = 'li')
  *
  * @return string HTML
  */
-function li(array $ta, $st)
-{
-    $li = new XH\Li();
-    return $li->render($ta, $st);
+function li(?array $ta, $st) {
+$ta = $ta ?? [];
+$li = new XH\Li();
+return $li->render($ta, $st);
 }
 
 /**

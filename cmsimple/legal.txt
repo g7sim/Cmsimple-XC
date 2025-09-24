@@ -1,4 +1,4 @@
-<p>CMSimple_XH is provided under the GPL3 license.</p>
+<p>CMSimple_XH (and Cmsimple_XC) is provided under the GPL3 license.</p>
 <h4 style="text-align: center;">GNU GENERAL PUBLIC LICENSE</h4>
 <p style="text-align: center;">Version 3, 29 June 2007</p>
 
