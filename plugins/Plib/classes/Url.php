@@ -76,6 +76,7 @@ final class Url
     public function path(string $path): self
     {
         $that = clone $this;
+        $path = implode("/", array_map("rawurlencode", explode("/", $path)));
         $that->base = (string) preg_replace(['/[^\/]*\/\.\.\//', '/\/\./'], '', $that->base . $path);
         $that->page = "";
         $that->params = [];

@@ -38,14 +38,34 @@ class SystemChecker
         return extension_loaded($extension);
     }
 
+    /** @deprecated Use {@see SystemChecker::checkGdFeature()} instead. */
     public function checkGdFreetype(): bool
     {
-        return function_exists("gd_info") && gd_info()['FreeType Support'];
+        return $this->checkGdFeature("FreeType");
     }
 
+    /** @deprecated Use {@see SystemChecker::checkGdFeature()} instead. */
     public function checkGdPng(): bool
     {
-        return function_exists("imagetypes") && (imagetypes() & IMG_PNG);
+        return $this->checkGdFeature("PNG");
+    }
+
+    /**
+     * Wraps the most relevant features reported by gd_info()
+     *
+     * @param string $feature either `FreeType`, `GIF Read`, `GIF Create`,
+     *                        `JPEG`, `PNG`, `WBMP`, `XPM`, `XBM`, `WebP`,
+     *                        `BMP`, `TGA Read` or `AVIF`.
+     *
+     * @since 1.11
+     */
+    public function checkGdFeature(string $feature): bool
+    {
+        if (!function_exists("gd_info")) {
+            return false;
+        }
+        $info = gd_info();
+        return array_key_exists("$feature Support", $info) && $info["$feature Support"];
     }
 
     /** @since 1.1 */
