@@ -224,7 +224,7 @@ class Mailform
     {
         global $sn, $cf, $tx, $su;
 
-        $random = rand(10000, 99999);
+        $random = random_int(10000, 99999);
         $url = $sn . ($this->embedded ? '?' . $su : '');
         $o = '<form class="xh_mailform" action="' . $url
             . '#xh_mailform" method="post">' . "\n";
