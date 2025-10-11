@@ -167,6 +167,7 @@ class Mailform
         $this->mail->addHeader('Reply-To', $this->sender);
         $this->mail->addHeader('X-Remote', sv('REMOTE_ADDR'));
         $this->mail->setSubject($this->subject);
+		$sendermail = isset($_POST['sendermail']) ? $_POST['sendermail'] : '';
         $this->mail->setMessage(
             rtrim($tx['mailform']['sendername'] . $this->sendername) . "\n"
             . rtrim($tx['mailform']['senderphone'] . $this->senderphone) . "\n"

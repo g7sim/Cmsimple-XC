@@ -2,7 +2,7 @@
 
 * This git contains a modified and progressed fork of Cmsimple XH 1.7.2 with clean urls and a http - security filter and nonce.
 
-* It has the same GPL3 license (Licenses of plugins are to be observed), und there is also a Wikipedia article about the <a href=https://en.wikipedia.org/wiki/CMSimple> history of Cmsimple</a>
+* It has the same GPL3 license (Licenses of plugins are to be observed), und there is also a Wikipedia article about the <a href=https://en.wikipedia.org/wiki/CMSimple> history of Cmsimple</a>, which had a paid GPL-3 version and a backlink-version while Peter Harteg was the owner.
 
 * You should use at least php 8.1
 
@@ -34,5 +34,5 @@
 
 * If You find bugs, please open an issue above. You may also make a fork and a push with Your solutions and proposals.
 
-* For installation and other questions please see here above under <a href=https://github.com/g7sim/cmsimple-XH-CL/wiki>Wiki</a>.
+* For installation and other questions please see here above under <a href=https://github.com/g7sim/cmsimple-XH-CL/wiki>Wiki</a> !
 
