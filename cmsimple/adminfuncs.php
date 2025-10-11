@@ -1002,7 +1002,8 @@ function XH_saveEditorContents($text)
             $text = '<!--XH_ml1:' . $tx['toc']['missing'] . '-->' . "\n" . $text;
         }
     }
-    $c[$s] = $text; // keep editor contents, if saving fails
+	
+	$c[$s] = $text; // keep editor contents, if saving fails
 
     // insert $text to $c
     $text = preg_replace('/<!--XH_ml[1-9]:/is', "\x00" . '$0', $text);

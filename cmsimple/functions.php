@@ -2938,25 +2938,3 @@ function XH_redirectSelectedUrl()
     return $result;
 }
 
-/**
- * Sanitizes user-submitted HTML content using htmLawed.
- * @param string $html The raw HTML content to be sanitized.
- * @return string The sanitized HTML.
- */
-function XH_sanitize_html($html)
-{
-    if (!function_exists('htmLawed')) {
-        global $pth; 
-        require_once $pth['folder']['base'] . 'assets/HTMLawed/htmLawed.php';
-    }
-	
-    $config = array(
-        'safe' => 1,          // 'safe' preset for strong security
-        'deny_attribute' => 'on*, style', // Deny all 'on*' event handlers and the style attribute
-        'schemes' => 'href: http, https, mailto, ftp, tel; src: http, https', //  allowed URL schemes
-        'keep_bad' => 0,      // Strip invalid tags and attributes
-        'elements' => '* -script -style +iframe', //allow standard elements except <script> and <style> , iframes (e.g., for YouTube)
-    );
-
-    return htmLawed($html, $config);
-}

@@ -69,7 +69,7 @@ class CSRFProtection
          1. No token currently exists ($this->currentToken is null), OR
          2. We require a new token for every request ($this->generatePerRequest is true). */
         if ($this->currentToken === null || $this->generatePerRequest) {
-            $this->currentToken = bin2hex(random_bytes(32));
+            $this->currentToken = base64_encode(random_bytes(128));
         }
 
         return sprintf(
