@@ -243,3 +243,25 @@ use CssCrush\Crush;
 require_once ('assets/js/Minifier.php');
 use JShrink\Minifier;
 
+/*----------------------Canonical----------------------------------------*/
+
+// Determine the scheme securely
+$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+
+// Sanitize and validate the host
+$host = filter_var($_SERVER['HTTP_HOST'], FILTER_SANITIZE_URL);
+if (!filter_var($scheme . '://' . $host, FILTER_VALIDATE_URL)) {
+    // fallback to SERVER_NAME (less safe, but server-controlled)
+    $host = filter_var($_SERVER['SERVER_NAME'], FILTER_SANITIZE_URL);
+}
+
+// Ensure path is safe
+$path = htmlspecialchars(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), ENT_QUOTES, 'UTF-8');
+
+// Construct canonical URL
+$canonical = sprintf('%s://%s%s', $scheme, $host, $path);
+
+// $hjs .= '<link rel="canonical" href="' . $canonical . '" />';
+$hjs .= <<<HTML
+<link rel="canonical" href="$canonical" />
+HTML;
