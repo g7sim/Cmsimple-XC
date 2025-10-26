@@ -48,3 +48,4 @@ $cf['title']['format']="{SITE} - {PAGE}";
 $cf['mode']['advanced']="";
 $cf['format']['date']="long";
 $cf['format']['time']="short";
+$cf['purifier']['mode'] = "default";

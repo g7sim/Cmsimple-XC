@@ -4,8 +4,6 @@ div.xhFilebrowserDiv {
 	color: #000 !important;
 	text-decoration: none !important;
 	background: #fff !important;
-	border: 0 !important;
-	margin: 0 !important;
 	box-shadow:rgba(99,99,99,0.2) 0px 2px 8px 0px;
 	padding: 0.5em !important;
 	letter-spacing: normal;
@@ -181,7 +179,7 @@ div.xhFilebrowserDiv span.fa-edit {
 	color: SteelBlue;
 }
 div.xhFilebrowserDiv span.fa-trash {
-	color: Tomato;
+	color: #d59654;
 }
 /* Buttons */
 div.xhFilebrowserDiv button {

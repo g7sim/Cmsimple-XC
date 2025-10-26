@@ -657,3 +657,12 @@ form#ta{
 scrollbar-color: gray lightgray;
   scrollbar-width: thin;
 }
+
+.fconf, .xhFilebrowserDiv{display: block;
+  max-width:70%; 
+  margin:auto;
+  padding:15px;}
+  
+ h1{font-size : 1.5em !important;}
+ 
+ 
