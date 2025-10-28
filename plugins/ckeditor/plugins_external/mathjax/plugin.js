@@ -478,4 +478,4 @@ editor.config.mathJaxLib = '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJ
  * @member CKEDITOR.config
  */
 
- CKEDITOR.scriptLoader.load( '/MathJax.js' );
+ CKEDITOR.scriptLoader.load( './MathJax.js' );
