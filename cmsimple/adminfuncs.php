@@ -737,7 +737,7 @@ function XH_adminMenu(array $plugins = array())
         ),
         array(
             'label' => utf8_ucfirst($tx['editmenu']['logout']),
-            'url' => $sn . '&logout'
+            'url' => $su . '&logout'
         )
     );
 
