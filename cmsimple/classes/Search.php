@@ -202,7 +202,7 @@ class Search
         global $h, $u, $sn, $cf, $tx, $pd_router;
 
         $cf['meta']['robots'] = 'noindex, nofollow';
-        $o = '<h1>' . $tx['search']['result'] . '</h1>';
+        $o = '<h4 class="sres">' . $tx['search']['result'] . '</h4>';
         $words = $this->getWords();
         $pages = $this->search();
         $count = count($pages);
