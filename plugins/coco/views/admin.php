@@ -24,8 +24,8 @@ if (!defined("CMSIMPLE_XH_VERSION")) {header("HTTP/1.0 403 Forbidden"); exit;}
     <tr>
       <td>
         <label>
-          <input type="checkbox" name="coco_name[]" value="<?=$this->esc($coco)?>">
-          <span><?=$this->esc($coco)?></span>
+         <input type="checkbox" name="coco_name[]" value="<?=$this->esc($coco ?? '')?>">
+          <span><?=$this->esc($coco ?? '')?></span>
         </label>
       </td>
     </tr>
@@ -45,8 +45,8 @@ if (!defined("CMSIMPLE_XH_VERSION")) {header("HTTP/1.0 403 Forbidden"); exit;}
     <tr>
       <td>
         <label>
-          <input type="checkbox" name="coco_name[]" value="<?=$this->esc($coco)?>">
-          <span><?=$this->esc($coco)?></span>
+          <input type="checkbox" name="coco_name[]" value="<?=$this->esc($coco ?? '')?>">
+          <span><?=$this->esc($coco ?? '')?></span>
         </label>
       </td>
     </tr>
