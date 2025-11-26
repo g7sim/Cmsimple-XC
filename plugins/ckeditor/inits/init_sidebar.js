@@ -17,6 +17,9 @@
     //%autogrow_on_startup%
     toolbarCanCollapse : true,
 	
+    fillEmptyBlocks: false,
+    forcePasteAsPlainText: true,
+	
     entities : false,
     entities_latin : false,
     entities_greek : false,

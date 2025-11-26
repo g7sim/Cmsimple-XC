@@ -56,7 +56,7 @@ class PageDataEditor
     {
         global $pd_router;
 
-        $fields = $_POST['xh_fields'];
+        $fields = $_POST['xh_fields'] ?? [];
         if (empty($fields)) {
             return 0;
         }
