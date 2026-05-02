@@ -16,7 +16,7 @@ $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 
 // Only protect the actual login endpoint
-if ($method !== 'POST' || $uri !== '/login') {
+if ($method !== 'POST' || strtolower($uri) !== '/login') {
     return;
 }
 
