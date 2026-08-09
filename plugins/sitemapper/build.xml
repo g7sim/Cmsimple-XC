@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="Sitemapper" default="help">
+
+    <fileset id="php-sources" dir=".">
+        <include name="index.php"/>
+        <include name="sitemapper_view.php"/>
+        <include name="classes/*.php"/>
+    </fileset>
+
+    <fileset id="unit-tests" dir="tests/unit">
+        <include name="*Test.php"/>
+    </fileset>
+
+    <target name="help" description="lists available targets">
+        <exec command="phing -l" outputProperty="help"/>
+        <echo>${help}</echo>
+    </target>
+
+    <target name="sniff" description="checks adherence to the coding standard">
+        <phpcodesniffer standard="PSR2" haltonerror="true">
+            <fileset refid="php-sources"/>
+            <fileset refid="unit-tests"/>
+        </phpcodesniffer>
+    </target>
+
+    <target name="mess" description="detects code flaws">
+        <phpmd>
+            <fileset refid="php-sources"/>
+            <fileset refid="unit-tests"/>
+         </phpmd>
+    </target>
+
+    <target name="compat" description="checks PHP requirements">
+        <exec command="phpcompatinfo analyser:run --alias current" logoutput="true"/>
+    </target>
+
+    <target name="uml" description="generates UML class diagram">
+        <exec command="umlwriter diagram:render --reflector=reflect --processor=graphviz classes | dot -Tpng -o UML.png"
+              logoutput="true"/>
+    </target>
+
+    <target name="unit-tests" description="runs all unit tests">
+        <phpunit bootstrap="classes/required_classes.php"
+                 haltonerror="true" haltonfailure="true">
+            <formatter type="plain" usefile="false"/>
+            <batchtest>
+                <fileset refid="unit-tests"/>
+            </batchtest>
+        </phpunit>
+    </target>
+
+    <target name="coverage" description="generates coverage report">
+        <exec command="phpunit --configuration coverage.xml"
+              logoutput="true"/>
+    </target>
+
+    <target name="build">
+        <fail unless="version" message="version is not defined!"/>
+        <exec command="git archive -o export.tar HEAD" checkreturn="true"/>
+        <untar file="export.tar" todir="export"/>
+        <delete file="export.tar"/>
+        <move todir="dist">
+            <fileset dir="export">
+                <include name="index.php"/>
+                <include name="version.nfo"/>
+            </fileset>
+            <filterchain>
+                <replacetokens>
+                    <token key="SITEMAPPER_VERSION" value="${version}"/>
+                </replacetokens>
+            </filterchain>
+        </move>
+        <move todir="dist">
+            <fileset dir="export">
+                <exclude name="build.xml"/>
+                <exclude name="composer.*"/>
+                <exclude name="coverage.xml"/>
+                <exclude name="pax_global_header"/>
+                <exclude name="phpcompatinfo.json"/>
+                <exclude name="README.md"/>
+                <exclude name="tests/**"/>
+            </fileset>
+        </move>
+        <delete dir="export"/>
+        <copy file="dist/config/config.php" tofile="dist/config/defaultconfig.php"/>
+        <copy file="dist/languages/en.php" tofile="dist/languages/default.php"/>
+        <zip destfile="Sitemapper_XH-${version}.zip" basedir="dist" prefix="sitemapper/"/>
+        <delete dir="dist"/>
+    </target>
+
+    <target name="build-patch" description="builds a distributable update package">
+        <fail unless="patchee" message="patchee is not defined!"/>
+        <fail unless="version" message="version is not defined!"/>
+        <unzip file="Sitemapper_XH-${version}.zip" todir="current"/>
+        <unzip file="${patchee}" todir="patchee"/>
+        <copy todir="dist">
+            <fileset dir="current">
+                <different targetdir="patchee" ignoreFileTimes="true"/>
+            </fileset>
+        </copy>
+        <delete>
+            <fileset dir="dist/sitemapper">
+                <include name="config/config.php"/>
+                <include name="languages/??.php"/>
+                <include name="css/stylesheet.css"/>
+            </fileset>
+        </delete>
+        <zip destfile="Sitemapper_XH-${version}-PATCH.zip" basedir="dist"
+             includeemptydirs="false"/>
+        <delete dir="patchee" quiet="true"/>
+        <delete dir="current" quiet="true"/>
+        <delete dir="dist" quiet="true"/>
+    </target>
+
+</project>
